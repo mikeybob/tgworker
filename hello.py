@@ -12,7 +12,9 @@ if not os.getenv('GITHUB_ACTIONS'):
 api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
 phone_number = os.getenv('PHONE_NUMBER')
+session_name = 'mysession_name'  # 确保与上传的会话文件名匹配
 
 # The first parameter is the .session file name (absolute paths allowed)
-with TelegramClient('anon', api_id, api_hash) as client:
+with TelegramClient(session_name, api_id, api_hash) as client:
+    client.start(phone_number)
     client.loop.run_until_complete(client.send_message('me', 'Hello, myself1!'))
