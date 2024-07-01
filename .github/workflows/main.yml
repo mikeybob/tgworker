@@ -2,7 +2,7 @@ name: Run Telethon Bot
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # 每 5 分钟运行一次
+    - cron: '*/10 * * * *'  # 每 5 分钟运行一次
 
 jobs:
   run-telethon-bot:
@@ -10,7 +10,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v目
+      uses: actions/checkout@v3
 
     - name: Set up Python
       uses: actions/setup-python@v4
