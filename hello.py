@@ -17,4 +17,6 @@ session_name = 'mysession_name'  # 确保与上传的会话文件名匹配
 # The first parameter is the .session file name (absolute paths allowed)
 with TelegramClient(session_name, api_id, api_hash) as client:
     client.start(phone_number)
-    client.loop.run_until_complete(client.send_message('me', 'Hello, myself1!'))
+     # Send a message
+    client.send_message('me', 'Hello, World!')
+    print('Message sent successfully!')
