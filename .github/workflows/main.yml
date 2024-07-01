@@ -30,7 +30,7 @@ jobs:
         SESSION_PASSWORD: ${{ secrets.SESSION_PASSWORD }}
       run: |
         openssl aes-256-cbc -d -pbkdf2 -in mysession_name.session.enc -out mysession_name.session -pass pass:$SESSION_PASSWORD
-
+       
 
     - name: Run Telethon script
       env:
