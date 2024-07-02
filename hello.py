@@ -13,7 +13,7 @@ if not os.getenv('GITHUB_ACTIONS'):
 api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
 phone_number = os.getenv('PHONE_NUMBER')
-session_name = f"{api_id}_session_name"  # 确保与上传的会话文件名匹配
+session_name = f"{api_id}session_name"  # 确保与上传的会话文件名匹配
 
 
 # 创建客户端
