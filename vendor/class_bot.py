@@ -23,7 +23,7 @@ class LYClass:
                     
                 except asyncio.TimeoutError:
                     # 如果超时，发送超时消息
-                    await client.send_message(-1001717350482, "__timeout__", reply_to=message.id)
+                    await client.send_message(-1001717350482, "the bot was timeout", reply_to=message.id)
                     print("Response timeout.")
                     return
 
@@ -97,6 +97,11 @@ class LYClass:
     async def mediabk(self, client, message):
         bot_username = 'MediaBK2Bot'
         await self.wpbot(client, message, bot_username)
+
+    async def filesave(self, client, message):
+        bot_username = 'FileSaveNewBot'
+        await self.wpbot(client, message, bot_username)
+        
 
 
         

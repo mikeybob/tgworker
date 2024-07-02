@@ -34,7 +34,8 @@ async def process_message(message):
             50074: ly_class_instance.datapan,
             43058: ly_class_instance.mediabk,
             43064: ly_class_instance.showfiles,
-            43060: ly_class_instance.blgg
+            43060: ly_class_instance.blgg,
+            43062: ly_class_instance.filesave
         }
 
         reply_id = message.reply_to.reply_to_msg_id if message.reply_to else None
