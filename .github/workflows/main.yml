@@ -27,9 +27,10 @@ jobs:
 
     - name: Decrypt Telethon session file
       env:
+        API_ID: ${{ secrets.API_ID }}
         SESSION_PASSWORD: ${{ secrets.SESSION_PASSWORD }}
       run: |
-        openssl aes-256-cbc -d -pbkdf2 -in mysession_name.session.enc -out mysession_name.session -pass pass:$SESSION_PASSWORD
+        openssl aes-256-cbc -d -pbkdf2 -in $API_IDsession_name.session.enc -out $API_IDsession_name.session -pass pass:$SESSION_PASSWORD
        
 
     - name: Run Telethon script
