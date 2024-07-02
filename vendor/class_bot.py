@@ -1,4 +1,5 @@
 from telethon import types
+import asyncio
 
 class LYClass:
     def __init__(self, name):
@@ -16,8 +17,18 @@ class LYClass:
 
                 forwarded_message = await conv.send_message(message.text)
                 
-                # 获取机器人的响应
-                response = await conv.get_response(forwarded_message.id)
+                try:
+                    # 获取机器人的响应，等待30秒
+                    response = await asyncio.wait_for(conv.get_response(forwarded_message.id), timeout=30)
+                    
+                except asyncio.TimeoutError:
+                    # 如果超时，发送超时消息
+                    await client.send_message(-1001717350482, "__timeout__", reply_to=message.id)
+                    print("Response timeout.")
+                    return
+
+
+               
               
                 if response.media:
                     if isinstance(response.media, types.MessageMediaDocument):
@@ -75,30 +86,17 @@ class LYClass:
         bot_username = 'FilesDrive_BLGG_bot'
         await self.wpbot(client, message, bot_username)
             
-        
-    
     async def showfiles(self, client, message):
-        try:
-            bot_username = 'ShowFilesBot'
-            await self.wpbot(client, message, bot_username)
-            
-        except Exception as e:
-            print(f"\rAn error occurred: {e}\n")
+        bot_username = 'ShowFilesBot'
+        await self.wpbot(client, message, bot_username)
+
     async def datapan(self, client, message):
-        try:
-            bot_username = 'datapanbot'
-            await self.wpbot(client, message, bot_username)
-            
-        except Exception as e:
-            print(f"\rAn error occurred: {e}\n")
+        bot_username = 'datapanbot'
+        await self.wpbot(client, message, bot_username)
 
     async def mediabk(self, client, message):
-        try:
-            bot_username = 'MediaBK2Bot'
-            await self.wpbot(client, message, bot_username)
-            
-        except Exception as e:
-            print(f"\rAn error occurred: {e}\n")
+        bot_username = 'MediaBK2Bot'
+        await self.wpbot(client, message, bot_username)
 
 
         
