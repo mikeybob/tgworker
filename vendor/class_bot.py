@@ -101,8 +101,26 @@ class LYClass:
     async def filesave(self, client, message):
         bot_username = 'FileSaveNewBot'
         await self.wpbot(client, message, bot_username)
+
+    async def wangpan(self, client, message):
+        bot_username = 'WangPanBOT'
+        await self.wpbot(client, message, bot_username)
+
+    async def filetobot(self, client, message):
+        bot_username = 'filetobot'
+        message.text = "/start "+message.text
+        await self.wpbot(client, message, bot_username) 
+
+    async def filein(self, client, message):
+        bot_username = 'fileinbot'
+        message.text = "/start "+message.text
+        await self.wpbot(client, message, bot_username) 
+
+ 
+    async def fileoffrm(self, client, message):
+        bot_username = 'fileoffrm_bot'
+        message.text = "/start "+message.text
+        await self.wpbot(client, message, bot_username)        
+
+ 
         
-
-
-        
-
