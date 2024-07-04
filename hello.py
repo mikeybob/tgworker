@@ -63,20 +63,20 @@ async def main():
 
     start_time = time.time()
     while True:
-        # 获取最近5条消息
-        async for message in client.iter_messages(chat_id, limit=5):
+        # 获取最近3条消息
+        async for message in client.iter_messages(chat_id, limit=3):
             if message.reply_to:
                 await process_message(message)
         
         # 检查累计执行时间是否超过5分钟
         elapsed_time = time.time() - start_time
-        if elapsed_time > 280:  # 300秒等于5分钟
+        if elapsed_time > 900:  # 300秒等于15分钟
             print("Execution time exceeded 5 minutes. Stopping.")
             break
         else:
             print("Execution time is "+str(elapsed_time)+" seconds. Continuing...")
         
-        await asyncio.sleep(30)  # 间隔15秒
+        await asyncio.sleep(60)  # 间隔30秒
 
     
             
