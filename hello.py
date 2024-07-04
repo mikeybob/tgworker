@@ -76,7 +76,7 @@ async def main():
         else:
             print("Execution time is "+str(elapsed_time)+" seconds. Continuing...")
         
-        await asyncio.sleep(15)  # 间隔15秒
+        await asyncio.sleep(30)  # 间隔15秒
 
     
             
