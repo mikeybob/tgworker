@@ -2,8 +2,8 @@
 name: Deploy Telethon 
 
 on: 
- schedule:
-   - cron: '*/20 * * * *'  # 每 20 分钟运行一次
+  schedule:
+    - cron: '*/20 * * * *'  # 每 20 分钟运行一次
   push: 
     branches: 
       - master 
