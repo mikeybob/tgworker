@@ -60,6 +60,7 @@ async def main():
 
     # 使用指定的 chat_id
     chat_id = -1001958520048
+    ly_class_instance.chat_id = chat_id
 
     start_time = time.time()
     while True:

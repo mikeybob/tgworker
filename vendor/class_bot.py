@@ -2,14 +2,15 @@ from telethon import types
 import asyncio
 
 class LYClass:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, chat_id):
+        self.chat_id = chat_id 
 
     def greet(self, message):
         print(f"Hello, {self.name}!")
 
     async def wpbot(self, client, message, bot_username):
         try:
+            chat_id = self.chat_id
             message_a_id = message.id
             peer_a_id = message.peer_id;
             async with client.conversation(bot_username) as conv:
@@ -23,7 +24,7 @@ class LYClass:
                     
                 except asyncio.TimeoutError:
                     # 如果超时，发送超时消息
-                    await client.send_message(-1001717350482, "the bot was timeout", reply_to=message.id)
+                    await client.send_message(chat_id, "the bot was timeout", reply_to=message.id)
                     print("Response timeout.")
                     return
 
@@ -36,17 +37,17 @@ class LYClass:
                         if mime_type.startswith('video/'):
                             # 处理视频
                             video = response.media.document
-                            await client.send_file(-1001717350482, video, reply_to=message.id)
+                            await client.send_file(chat_id, video, reply_to=message.id)
                             print("Forwarded video.")
                         else:
                             # 处理文档
                             document = response.media.document
-                            await client.send_file(-1001717350482, document, reply_to=message.id)
+                            await client.send_file(chat_id, document, reply_to=message.id)
                             print("Forwarded document.")
                     elif isinstance(response.media, types.MessageMediaPhoto):
                         # 处理图片
                         photo = response.media.photo
-                        await client.send_file(-1001717350482, photo, reply_to=message.id)
+                        await client.send_file(chat_id, photo, reply_to=message.id)
                         print("Forwarded photo.")
                     else:
                         print("Received media, but not a document, video, or photo.")
@@ -58,7 +59,7 @@ class LYClass:
                     if response.text == "在您发的这条消息中，没有代码可以被解析":
                         await self.showfiles(client, message)
                     elif response.text == "💔抱歉，未找到可解析内容。":
-                        await client.send_message(-1001717350482, response.text, reply_to=message.id)
+                        await client.send_message(chat_id, response.text, reply_to=message.id)
                     else:
                         print("Received text response.")
 
