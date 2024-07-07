@@ -59,7 +59,7 @@ async def main():
     await client.start(phone_number)
 
     # 使用指定的 chat_id
-    chat_id = -1001717350482
+    chat_id = -1001958520048
 
     start_time = time.time()
     while True:
