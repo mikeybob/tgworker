@@ -31,15 +31,15 @@ async def process_message(message):
             print(f"Message has reply_to: {message.reply_to.reply_to_msg_id}\n")
 
         message_handlers = {
-            50074: ly_class_instance.datapan,
-            43058: ly_class_instance.mediabk,
-            43064: ly_class_instance.showfiles,
-            43060: ly_class_instance.blgg,
-            43062: ly_class_instance.filesave,
-            43072: ly_class_instance.wangpan,
-            43066: ly_class_instance.filetobot,
-            43070: ly_class_instance.fileoffrm,
-            43068: ly_class_instance.filein
+            28: ly_class_instance.datapan,
+            38: ly_class_instance.mediabk,
+            27: ly_class_instance.showfiles,
+            23: ly_class_instance.blgg,
+            40: ly_class_instance.filesave,
+            32: ly_class_instance.wangpan,
+            29: ly_class_instance.filetobot,
+            31: ly_class_instance.fileoffrm,
+            30: ly_class_instance.filein
         }
 
         reply_id = message.reply_to.reply_to_msg_id if message.reply_to else None

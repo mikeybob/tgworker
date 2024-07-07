@@ -122,5 +122,11 @@ class LYClass:
         message.text = "/start "+message.text
         await self.wpbot(client, message, bot_username)        
 
+
+    async def filesave(self, client, message):
+        bot_username = 'FileSaveNewBot'
+        await self.wpbot(client, message, bot_username)        
+
+
  
         
