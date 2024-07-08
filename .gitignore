@@ -5,6 +5,7 @@ __pycache__/
 
 *.session
 last_read_message_id.json
+memo.md
 # C extensions
 *.so
 
