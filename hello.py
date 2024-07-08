@@ -101,7 +101,7 @@ def match_pattern(input_str):
 # 定义消息处理函数
 async def process_message(message):
     try:
-        await asyncio.sleep(3)
+        await asyncio.sleep(5)
         # print(f"Processing message: {message}\n")
         print(f"Processing message: {message.id}\n")
 
@@ -126,13 +126,13 @@ async def main():
     await client.start(phone_number)
 
     # 使用指定的 chat_id
-    chat_id = -1001939978944
+    chat_id = -1001507154171
     ly_class_instance.chat_id = chat_id
 
     start_time = time.time()
     while True:
         # 获取最近3条消息
-        async for message in client.iter_messages(chat_id, limit=3):
+        async for message in client.iter_messages(chat_id, limit=20):
             await process_message(message)
         
         # 检查累计执行时间是否超过5分钟
@@ -143,7 +143,7 @@ async def main():
         else:
             print("Execution time is "+str(elapsed_time)+" seconds. Continuing... after 60 seconds.")
         
-        await asyncio.sleep(60)  # 间隔30秒
+        await asyncio.sleep(200)  # 间隔200秒
 
     
             
