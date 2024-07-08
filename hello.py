@@ -69,7 +69,7 @@ async def main():
 
      # 获取并处理频道实体
     try:
-        chat_id = -1001971784803
+        chat_id = -1001507154171
         entity = await client.get_entity(chat_id)
         ly_class_instance.chat_id = entity.id
     except ValueError as e:

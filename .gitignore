@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 *.session
+last_read_message_id.json
 # C extensions
 *.so
 
