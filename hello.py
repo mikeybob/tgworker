@@ -35,7 +35,6 @@ def match_pattern(input_str):
 # 定义消息处理函数
 async def process_message(message):
     try:
-       
         # print(f"Processing message: {message}\n")
         print(f"Processing message: {message.id}\n")
 
@@ -59,11 +58,11 @@ async def process_message(message):
             print(f"No matching pattern for message: {message.text} {message} \n")
 
         # 处理完消息后，保存最后读取的消息 ID
-        save_last_read_message_id(message.peer_id.channel_id, message.id)
+        #save_last_read_message_id(message.peer_id.channel_id, message.id)
 
 
     except Exception as e:
-        print(f"An error occurred while processing message: {e} {message}\n")
+        print(f"An error occurred while processing message: {e} \n message:{message}\n")
     finally:
          await asyncio.sleep(3)
 

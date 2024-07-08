@@ -63,15 +63,15 @@ class LYClass:
                         await self.showfiles(client, message)
                     elif response.text == "💔抱歉，未找到可解析内容。":
                         await client.send_message(chat_id, response.text, reply_to=message.id)
+                    elif response.text == "此机器人面向外国用户使用，访问 @MediaBKHome 获取面向国内用户使用的机器人":
+                        await self.showfiles(client, message)
+                    elif response.text == "access @MediaBKHome to get media backup bot for non-chinese-speaking user":
+                        await self.mediabk2(client, message)    
+
+
+
                     else:
-                        print("Received text response.")
-
-
-                    
-                    
-
-                    
-                    
+                        print("Received text response: "+response.text)
 
                     print("Forwarded text.")
                 else:
@@ -100,6 +100,10 @@ class LYClass:
 
     async def mediabk(self, client, message):
         bot_username = 'MediaBK2Bot'
+        await self.wpbot(client, message, bot_username)
+
+    async def mediabk2(self, client, message):
+        bot_username = 'MediaBKBK1Bot'
         await self.wpbot(client, message, bot_username)
 
     async def filesave(self, client, message):
@@ -149,6 +153,14 @@ wp_bot = [
         'mode': 'enctext',
         'pattern': r'(?:P_|V_|D_)[a-zA-Z0-9-_]{15,29}\b',
         'message_thread_id': '25'
+    },
+    {
+        'title': 'mediabk',
+        'bot_name': 'MediaBK2Bot',
+        'id': '5231326048',
+        'mode': 'enctext',
+        'pattern': r'\b[a-zA-Z0-9\-+=_]{20,33}(?:=_grp|_mda)\b',
+        'message_thread_id': '32'
     },
     {
         'title': 'showfiles',
