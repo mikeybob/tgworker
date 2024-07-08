@@ -79,22 +79,31 @@ async def main():
         print(f"Failed to get entity for chat_id {chat_id}: {e}")
         return
 
-    
+    # 加载最后读取的消息 ID
+    last_read_message_id = load_last_read_message_id(entity.id)
+  
+    # 获取最新的消息 ID
+    latest_message = await client.get_messages(entity, limit=1)
+    latest_message_id = latest_message[0].id if latest_message else 0
 
 
     start_time = time.time()
     while True:
         # 获取指定范围内的消息，最多读取20条
-        async for message in client.iter_messages(entity, limit=20, reverse=True):
+        async for message in client.iter_messages(entity, min_id=last_read_message_id, max_id=latest_message_id, limit=20, reverse=True):
             await process_message(message)
 
-        # 检查累计执行时间是否超过15分钟
+        # 更新最后读取的消息 ID
+        if latest_message_id > last_read_message_id:
+            last_read_message_id = latest_message_id
+        
+        # 检查累计执行时间是否超过5分钟
         elapsed_time = time.time() - start_time
-        if elapsed_time > 300:  # 300秒等于15分钟
+        if elapsed_time > 900:  # 900秒等于15分钟
             print("Execution time exceeded 5 minutes. Stopping.")
             break
         else:
-            print("Execution time is "+str(elapsed_time)+" seconds. Continuing... after 200 seconds.")
+            print("Execution time is "+str(elapsed_time)+" seconds. Continuing... after 60 seconds.")
         
         await asyncio.sleep(200)  # 间隔200秒
 
