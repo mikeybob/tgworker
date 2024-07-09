@@ -42,6 +42,7 @@ class LYClass:
                             video = response.media.document
                             await client.send_file(chat_id, video, reply_to=message.id)
                             print("Forwarded video.")
+                            
                         else:
                             # 处理文档
                             document = response.media.document
@@ -133,7 +134,12 @@ class LYClass:
 
     async def filesave(self, client, message):
         bot_username = 'FileSaveNewBot'
-        await self.wpbot(client, message, bot_username)        
+        await self.wpbot(client, message, bot_username)    
+
+    async def filespan1(self, client, message):
+        bot_username = 'FilesPan1Bot'
+        await self.wpbot(client, message, bot_username)  
+
 
 
  # 机器人信息和正则表达式定义
@@ -144,6 +150,14 @@ wp_bot = [
         'id': '6995324980',  # 6854050358
         'mode': 'enctext',
         'pattern': r'(?:p_|vi_|f_|fds_|pk_)[a-zA-Z0-9-_]{30,100}\b',
+        'message_thread_id': '23'
+    },
+    {
+        'title': 'filespan1',
+        'bot_name': 'FilesPan1Bot',
+        'id': '7174271897',  # 6854050358
+        'mode': 'enctext',
+        'pattern': r'(?:p_FilesPan1Bot_|v_FilesPan1Bot_|d_FilesPan1Bot_)[a-zA-Z0-9-_]{30,100}\b',
         'message_thread_id': '23'
     },
     {

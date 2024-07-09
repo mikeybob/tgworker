@@ -29,7 +29,7 @@ ly_class_instance = LYClass('text')
 def match_pattern(input_str):
     for bot in wp_bot:
         if re.search(bot['pattern'], input_str):
-            return bot['title']
+            return bot
     return None
 
 
