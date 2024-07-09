@@ -70,7 +70,8 @@ async def main():
 
      # 获取并处理频道实体
     try:
-        chat_id = -1001507154171
+        # chat_id = -1001507154171    #OLD
+        chat_id = -1001951775419
         # chat_id = -1001971784803    #TEST
         entity = await client.get_entity(chat_id)
         ly_class_instance.chat_id = entity.id
