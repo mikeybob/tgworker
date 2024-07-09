@@ -89,7 +89,7 @@ async def main():
 
         # 检查累计执行时间是否超过15分钟
         elapsed_time = time.time() - start_time
-        if elapsed_time > 300:  # 300秒等于15分钟
+        if elapsed_time > 1200:  # 300秒等于15分钟
             print("Execution time exceeded 5 minutes. Stopping.")
             break
         else:
