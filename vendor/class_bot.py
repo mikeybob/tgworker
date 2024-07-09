@@ -11,6 +11,41 @@ class LYClass:
     def greet(self, message):
         print(f"Hello, {self.name}!")
 
+    async def send_video_to_filetobot_and_beachboy807bot(self, client, video, original_message):
+        chat_id = self.chat_id
+        original_message_id = original_message.id
+
+        # 将视频发送到 filetobot 并等待响应
+        async with client.conversation('filetobot') as filetobot_conv:
+            filetobot_message = await filetobot_conv.send_file(video)
+            try:
+                # 持续监听
+                # ，直到接收到媒体文件
+                while True:
+                    filetobot_response = await asyncio.wait_for(filetobot_conv.get_response(filetobot_message.id), timeout=30)
+                    if filetobot_response.media:
+                        # print(f"Received media response: {filetobot_response}\n")
+                        # print(f"Received media response: {filetobot_response.message}\n")
+                        # print(f"Received media response: {filetobot_response.text}\n")
+                        break
+                    else:
+                        print("Received text response, waiting for media...")
+
+            except asyncio.TimeoutError:
+                await client.send_message(chat_id, "filetobot timeout", reply_to=original_message_id)
+                print("filetobot response timeout.")
+                return
+
+            # 将 filetobot 的响应内容传送给 beachboy807bot，并设置 caption 为原始消息的文本
+            async with client.conversation('beachboy807bot') as beachboy807bot_conv:
+                caption_text = "|_SendToBeach_|\n"+original_message.text+"\n"+filetobot_response.message
+                await beachboy807bot_conv.send_file(filetobot_response.media, caption=caption_text)
+                print("Forwarded filetobot response to beachboy807bot with caption.")
+
+                
+
+
+
     async def wpbot(self, client, message, bot_username):
         try:
             chat_id = self.chat_id
@@ -43,15 +78,28 @@ class LYClass:
                             await client.send_file(chat_id, video, reply_to=message.id)
                             print("Forwarded video.")
                             
+                            # 调用新的函数
+                            await self.send_video_to_filetobot_and_beachboy807bot(client, video, message)
+                  
                         else:
                             # 处理文档
                             document = response.media.document
                             await client.send_file(chat_id, document, reply_to=message.id)
+
+                            caption_text = "|_SendToBeach_|\n"+message.text
+                            await client.send_file("beachboy807bot", document, caption=caption_text)
+                            
+
+
                             print("Forwarded document.")
                     elif isinstance(response.media, types.MessageMediaPhoto):
                         # 处理图片
                         photo = response.media.photo
                         await client.send_file(chat_id, photo, reply_to=message.id)
+
+                        caption_text = "|_SendToBeach_|\n"+message.text
+                        await client.send_file("beachboy807bot", photo, caption=caption_text)
+                        
                         print("Forwarded photo.")
                     else:
                         print("Received media, but not a document, video, or photo.")
@@ -142,89 +190,6 @@ class LYClass:
 
 
 
- # 机器人信息和正则表达式定义
-wp_bot = [
-    {
-        'title': 'blgg',
-        'bot_name': 'FilesDrive_BLGG_bot',
-        'id': '6995324980',  # 6854050358
-        'mode': 'enctext',
-        'pattern': r'(?:p_|vi_|f_|fds_|pk_)[a-zA-Z0-9-_]{30,100}\b',
-        'message_thread_id': '23'
-    },
-    {
-        'title': 'filespan1',
-        'bot_name': 'FilesPan1Bot',
-        'id': '7174271897',  # 6854050358
-        'mode': 'enctext',
-        'pattern': r'(?:p_FilesPan1Bot_|v_FilesPan1Bot_|d_FilesPan1Bot_)[a-zA-Z0-9-_]{30,100}\b',
-        'message_thread_id': '23'
-    },
-    {
-        'title': 'filesave',
-        'bot_name': 'FileSaveNewBot',
-        'id': '7008164392',  # 6854050358
-        'mode': 'enctext',
-        'pattern': r'(?:P_|V_|D_)[a-zA-Z0-9-_]{15,29}\b',
-        'message_thread_id': '25'
-    },
-    {
-        'title': 'mediabk',
-        'bot_name': 'MediaBK2Bot',
-        'id': '5231326048',
-        'mode': 'enctext',
-        'pattern': r'\b[a-zA-Z0-9\-+=_]{20,33}(?:=_grp|_mda)\b',
-        'message_thread_id': '32'
-    },
-    {
-        'title': 'showfiles',
-        'bot_name': 'ShowFilesBot',
-        'id': '6976547743',  # 6854050358
-        'mode': 'enctext',
-        'pattern': r'(?:showfilesbot_|fds_|pk_)[a-zA-Z0-9-_]{15,29}\b',
-        'message_thread_id': '27'
-    },
-    {
-        'title': 'datapan',
-        'bot_name': 'datapanbot',
-        'id': '6854050358',  # 6854050358
-        'mode': 'enctext',
-        'pattern': r'(?:P_DataPanBot_|V_DataPanBot_|D_DataPanBot_|fds_|pk_)[a-zA-Z0-9-_]{30,100}\b',
-        'message_thread_id': '28'
-    },
-    {
-        'title': 'filetobot',
-        'bot_name': 'filetobot',
-        'id': '291481095',
-        'mode': 'link',
-        'pattern': r'https:\/\/t\.me\/filetobot\?start=(\w{14,20})',
-        'message_thread_id': '29'
-    },
-    {
-        'title': 'filein',
-        'bot_name': 'fileinbot',
-        'id': '1433650553',
-        'mode': 'link',
-        'pattern': r'https:\/\/t\.me\/fileinbot\?start=(\w{14,20})',
-        'message_thread_id': '30'
-    },
-    {
-        'title': 'fileoffrm',
-        'bot_name': 'fileoffrm_bot',
-        'id': '7085384480',
-        'mode': 'link',
-        'pattern': r'https:\/\/t\.me\/fileoffrm_bot\?start=(\w{14,20})',
-        'message_thread_id': '31'
-    },
-    {
-        'title': 'wangpan',
-        'bot_name': 'wangpanbot',
-        'id': '5231326048',
-        'mode': 'link',
-        'pattern': r'https:\/\/t\.me\/WangPanBOT\?start=(file\w{14,20})',
-        'message_thread_id': '32'
-    }
-]
         
 # 持久化存储最后读取的消息 ID
 LAST_READ_MESSAGE_FILE = "last_read_message_id.json"

@@ -1,10 +1,11 @@
 from telethon import TelegramClient, sync
 import os
-from vendor.class_bot import LYClass,wp_bot  # 导入 LYClass
+from vendor.class_bot import LYClass  # 导入 LYClass
+from vendor.wpbot import wp_bot  # 导入 wp_bot
 import asyncio
 import time
 import re
-from telethon.tl.types import InputMessagesFilterEmpty
+from telethon.tl.types import InputMessagesFilterEmpty,Message
 
 # 检查是否在本地开发环境中运行
 if not os.getenv('GITHUB_ACTIONS'):
@@ -41,17 +42,18 @@ async def process_message(message):
 
         if message.text:
 
-            title = match_pattern(message.text)
+            bot = match_pattern(message.text)
+            title = bot['title'] if bot else None
 
             if title:
                 handler = getattr(ly_class_instance, title, None)
                 if handler:
                     
                     if asyncio.iscoroutinefunction(handler):
-                        print(f"iscoroutinefunction\n")
+                       
                         await handler(client, message)
                     else:
-                        print(f"none-iscoroutinefunction\n")
+                        
                         handler(message)
                 else:
                     print(f"No handler found for title: {title}\n")
@@ -69,6 +71,7 @@ async def main():
      # 获取并处理频道实体
     try:
         chat_id = -1001507154171
+        # chat_id = -1001971784803    #TEST
         entity = await client.get_entity(chat_id)
         ly_class_instance.chat_id = entity.id
     except ValueError as e:
@@ -79,7 +82,9 @@ async def main():
     while True:
         # 获取指定范围内的消息，最多读取20条
         async for message in client.iter_messages(entity, limit=20, reverse=True,filter=InputMessagesFilterEmpty()):
-            await process_message(message)
+            if message.text:
+                await process_message(message)
+          
 
         # 检查累计执行时间是否超过15分钟
         elapsed_time = time.time() - start_time
