@@ -1,9 +1,10 @@
 from telethon import TelegramClient, sync
 import os
-from vendor.class_bot import LYClass,wp_bot,save_last_read_message_id,load_last_read_message_id  # 导入 LYClass
+from vendor.class_bot import LYClass,wp_bot  # 导入 LYClass
 import asyncio
 import time
 import re
+from telethon.tl.types import InputMessagesFilterEmpty
 
 # 检查是否在本地开发环境中运行
 if not os.getenv('GITHUB_ACTIONS'):
@@ -57,10 +58,6 @@ async def process_message(message):
         else:
             print(f"No matching pattern for message: {message.text} {message} \n")
 
-        # 处理完消息后，保存最后读取的消息 ID
-        #save_last_read_message_id(message.peer_id.channel_id, message.id)
-
-
     except Exception as e:
         print(f"An error occurred while processing message: {e} \n message:{message}\n")
     finally:
@@ -78,27 +75,21 @@ async def main():
         print(f"Failed to get entity for chat_id {chat_id}: {e}")
         return
 
-    
-
-
     start_time = time.time()
     while True:
         # 获取指定范围内的消息，最多读取20条
-        async for message in client.iter_messages(entity, limit=20, reverse=True):
+        async for message in client.iter_messages(entity, limit=20, reverse=True,filter=InputMessagesFilterEmpty()):
             await process_message(message)
 
         # 检查累计执行时间是否超过15分钟
         elapsed_time = time.time() - start_time
-        if elapsed_time > 1200:  # 300秒等于15分钟
+        if elapsed_time > 1200:  #1200秒等于20分钟
             print("Execution time exceeded 5 minutes. Stopping.")
             break
         else:
             print("Execution time is "+str(elapsed_time)+" seconds. Continuing... after 200 seconds.")
         
         await asyncio.sleep(200)  # 间隔200秒
-
-    
-            
 
 with client:
     client.loop.run_until_complete(main())
