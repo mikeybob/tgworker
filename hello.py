@@ -179,16 +179,19 @@ async def main():
                     if media_count >= max_media_count:
                         break
 
-
             elapsed_time = time.time() - start_time
             if elapsed_time > max_process_time:  # 1200秒等于20分钟
-                print(f"Execution time exceeded {max_process_time} seconds. Stopping.")
                 break
-            
+
+
             if media_count >= max_media_count:
                 print(f"Media count exceeded {max_media_count}. Stopping.\n")
                 break
 
+        elapsed_time = time.time() - start_time
+        if elapsed_time > max_process_time:  # 1200秒等于20分钟
+            print(f"Execution time exceeded {max_process_time} seconds. Stopping.")
+            break
 
         print("Execution time is " + str(elapsed_time) + " seconds. Continuing next cycle... after 200 seconds.")
         await asyncio.sleep(200)  # 间隔200秒
