@@ -105,7 +105,7 @@ async def fetch_media_from_enctext(message):
         print(f"An error occurred while processing message: {e} \n message:{message}\n")
     finally:
         if title:
-            await asyncio.sleep(3)
+            await asyncio.sleep(5)
         else:
             await asyncio.sleep(0)
 
@@ -121,6 +121,7 @@ async def main():
 
     start_time = time.time()
     media_count = 0
+    
     while True:
         async for dialog in client.iter_dialogs():
             entity = dialog.entity
@@ -128,8 +129,11 @@ async def main():
             # 跳过来自 WAREHOUSE_CHAT_ID 的对话
             if this_chat_id == str(ly_class_instance.warehouse_chat_id):
                 continue
-            if str(entity.id) == '1838623494':
-                continue
+            # if this_chat_id == str(ly_class_instance.work_chat_id):
+                # continue
+           
+            # if str(entity.id) == '1838623494':
+                # continue
                 
                 
            
@@ -144,7 +148,10 @@ async def main():
             print(f"\nProcessing entity: {this_chat_id} - {entity_title}\n")
 
             if dialog.unread_count >= 0 and (dialog.is_user or dialog.is_group or dialog.is_channel):
-                last_read_message_id = ly_class_instance.load_last_read_message_id(entity.id)
+                if this_chat_id == str(ly_class_instance.work_chat_id):
+                    last_read_message_id = 0
+                else:
+                    last_read_message_id = ly_class_instance.load_last_read_message_id(entity.id)
 
                 print(f">Reading messages from entity {entity.id} - {last_read_message_id}\n")
                 async for message in client.iter_messages(entity, min_id=last_read_message_id, limit=30, reverse=True, filter=InputMessagesFilterEmpty()):
@@ -160,6 +167,7 @@ async def main():
                             # 跳过后续处理
                         elif entity.id == ly_class_instance.chat_id:
                             await fetch_media_from_enctext(message)
+                            media_count = media_count + 1
                         elif dialog.is_group or dialog.is_channel:
                             await forward_encstr_to_encbot(message)
                     elif message.media:
@@ -167,6 +175,7 @@ async def main():
                             last_message_id = await forward_media_to_warehouse(message)
                             media_count = media_count + 1
                     ly_class_instance.save_last_read_message_id(entity.id, last_message_id)
+                    
                     if media_count >= max_media_count:
                         break
 
