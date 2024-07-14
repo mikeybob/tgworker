@@ -32,7 +32,7 @@ except ValueError:
     print("Environment variable WORK_CHAT_ID or WAREHOUSE_CHAT_ID is not a valid integer.")
     exit(1)
 
-max_process_time = 20  # 20分钟
+max_process_time = 6  # 20分钟
 max_media_count = 10  # 2个媒体文件
 
 
@@ -194,7 +194,7 @@ async def main():
             break
 
         print("Execution time is " + str(elapsed_time) + " seconds. Continuing next cycle... after 200 seconds.")
-        await asyncio.sleep(200)  # 间隔200秒
+        await asyncio.sleep(2)  # 间隔200秒
 
 with client:
     client.loop.run_until_complete(main())
