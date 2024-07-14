@@ -32,7 +32,7 @@ except ValueError:
     print("Environment variable WORK_CHAT_ID or WAREHOUSE_CHAT_ID is not a valid integer.")
     exit(1)
 
-max_process_time = 1200  # 20分钟
+max_process_time = 20  # 20分钟
 max_media_count = 10  # 2个媒体文件
 
 
@@ -184,6 +184,7 @@ async def main():
             if elapsed_time > max_process_time:  # 1200秒等于20分钟
                 print(f"Execution time exceeded {max_process_time} seconds. Stopping.")
                 break
+            
             if media_count >= max_media_count:
                 print(f"Media count exceeded {max_media_count}. Stopping.\n")
                 break
