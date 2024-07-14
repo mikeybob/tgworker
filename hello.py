@@ -46,7 +46,7 @@ def match_pattern(input_str):
 async def forward_encstr_to_encbot(message):
     try:
         enc_exist = False
-        print(f">>Processing message(1): {message.id}\n")
+        print(f">>forward_encstr_to_encbot(1): {message.id}\n")
         if message.text:
             for bot in wp_bot:
                 pattern = re.compile(bot['pattern'])
@@ -68,7 +68,7 @@ async def forward_encstr_to_encbot(message):
 
 async def forward_media_to_warehouse(message):
     try:
-        print(f">>Processing message(2): {message.id}\n")
+        print(f">>forward_media_to_warehouse(2): {message.id}\n")
         if message.media:
             if message.chat_id != ly_class_instance.warehouse_chat_id:
                 last_message_id = await ly_class_instance.send_message(client, message)
@@ -86,7 +86,7 @@ async def forward_media_to_warehouse(message):
 # 定义消息处理函数
 async def fetch_media_from_enctext(message):
     try:
-        print(f">>Processing message(3): {message.id}\n")
+        print(f">>fetch_media_from_enctext(3): {message.id}\n")
         if message.text:
             bot = match_pattern(message.text)
             title = bot['title'] if bot else None
