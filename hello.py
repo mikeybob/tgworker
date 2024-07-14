@@ -163,7 +163,7 @@ async def main():
                         elif dialog.is_group or dialog.is_channel:
                             await forward_encstr_to_encbot(message)
                     elif message.media:
-                        if entity.id != ly_class_instance.chat_id:
+                        if ly_class_instance.warehouse_chat_id!=0 and entity.id != ly_class_instance.chat_id and entity.id != ly_class_instance.warehouse_chat_id:
                             last_message_id = await forward_media_to_warehouse(message)
                             media_count = media_count + 1
                     ly_class_instance.save_last_read_message_id(entity.id, last_message_id)
