@@ -132,8 +132,8 @@ async def main():
             # if this_chat_id == str(ly_class_instance.work_chat_id):
                 # continue
            
-            # if str(entity.id) == '1838623494':
-                # continue
+            if str(entity.id) == '2131062766':
+                continue
                 
                 
            
