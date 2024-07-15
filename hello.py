@@ -54,7 +54,8 @@ async def main():
     await client.start(phone_number)
     
     try:
-        entity = await client.get_entity(tgbot.config['work_chat_id'])
+        chat_id = "-100"+str(tgbot.config['work_chat_id'])
+        entity = await client.get_entity(chat_id)
         tgbot.chat_id = entity.id
     except ValueError as e:
         print(f"Failed to get entity for chat_id {tgbot.config['work_chat_id']}: {e}")
