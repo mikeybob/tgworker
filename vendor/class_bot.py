@@ -203,6 +203,9 @@ class LYClass:
                        
                     elif response.text == "💔抱歉，未找到可解析内容。":
                         await client.send_message(chat_id, response.text, reply_to=message.id)
+                        
+                    elif response.text == "创建者申请了新的分享链接，此链接已过期":
+                        await self.wpbot(self.client, message, 'ShowFilesBot')
                     elif response.text == "此机器人面向外国用户使用，访问 @MediaBKHome 获取面向国内用户使用的机器人":
                         await self.wpbot(self.client, message, 'ShowFilesBot')
                         
