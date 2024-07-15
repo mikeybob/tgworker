@@ -3,7 +3,7 @@ name: Deploy Telethon
 
 on: 
   schedule:
-   - cron: '*/30 * * * *'  # 每 20 分钟运行一次
+   - cron: '*/30 * * * *'  # 每 30 分钟运行一次
   push: 
     branches: 
       - master 
@@ -45,8 +45,16 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: last_read_message_id
-        path: .
+        path: last_read_message_id.json
       continue-on-error: true
+
+    - name: Check for last_read_message_id.json
+      run: |
+        if [ -f last_read_message_id.json ]; then
+          echo "last_read_message_id.json exists."
+        else
+          echo "last_read_message_id.json does not exist."
+        fi      
 
 
 
@@ -61,6 +69,15 @@ jobs:
         WAREHOUSE_CHAT_ID: ${{ secrets.WAREHOUSE_CHAT_ID }}
       run: |
         python hello.py
+
+    - name: Check if last_read_message_id.json was created
+      run: |
+        if [ -f last_read_message_id.json ]; then
+          echo "last_read_message_id.json was created."
+        else
+          echo "last_read_message_id.json was not created."
+        fi
+
 
     - name: Upload last_read_message_id.json artifact
       uses: actions/upload-artifact@v2
