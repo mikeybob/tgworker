@@ -11,11 +11,36 @@ class LYClass:
     # 持久化存储最后读取的消息 ID
     LAST_READ_MESSAGE_FILE = "last_read_message_id.json"
 
-    def __init__(self, chat_id):
-        self.chat_id = chat_id 
+    def __init__(self, config):
+        self.config = config 
+        
 
-    def greet(self, message):
-        print(f"Hello, {self.name}!")
+    # 查找文字，若存在匹配的字串，則根據傳入的參數mode來處理，若mode=bot,則用 fetch_media_from_enctext 函數處理。若 mode=encstr，則用 forward_encstr_to_encbot 函數處理; 
+    async def _from_enctext(self,message,mode):
+        try:
+            print(f">>fetch_media_from_enctext(3): {message.id}\n")
+            if message.text:
+                bot = match_pattern(message.text)
+                title = bot['title'] if bot else None
+                if title:
+                    handler = getattr(ly_class_instance, title, None)
+                    if handler:
+                        if asyncio.iscoroutinefunction(handler):
+                            await handler(client, message)
+                        else:
+                            handler(message)
+                    else:
+                        print(f"No handler found for title: {title}\n")
+            else:
+                print(f"No matching pattern for message: {message.text} {message} \n")
+        except Exception as e:
+            print(f"An error occurred while processing message: {e} \n message:{message}\n")
+        finally:
+            if title:
+                await asyncio.sleep(5)
+            else:
+                await asyncio.sleep(0)
+
 
     async def send_message(self, client, message):
         last_message_id = message.id

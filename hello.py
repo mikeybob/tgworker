@@ -21,8 +21,20 @@ session_name = api_id + 'session_name'  # 确保与上传的会话文件名匹�
 # 创建客户端
 client = TelegramClient(session_name, api_id, api_hash)
 
+config = {
+    'api_id': os.getenv('API_ID'),
+    'api_hash': os.getenv('API_HASH'),
+    'phone_number': os.getenv('PHONE_NUMBER'),
+    'session_name': os.getenv('API_ID') + 'session_name',
+    'work_bot_id': os.getenv('WORK_BOT_ID'),
+    'work_chat_id': os.getenv('WORK_CHAT_ID'),
+    'public_bot_id': os.getenv('PUBLIC_BOT_ID'),
+    'warehouse_chat_id': os.getenv('WAREHOUSE_CHAT_ID')
+}
+
+
 # 创建 LYClass 实例
-ly_class_instance = LYClass('text')
+ly_class_instance = LYClass(config)
 try:
     ly_class_instance.work_bot_id = os.getenv('WORK_BOT_ID')
     ly_class_instance.work_chat_id = int(os.getenv('WORK_CHAT_ID'))
@@ -109,6 +121,8 @@ async def fetch_media_from_enctext(message):
         else:
             await asyncio.sleep(0)
 
+
+
 async def main():
     await client.start(phone_number)
     
@@ -158,13 +172,12 @@ async def main():
                     last_message_id = message.id  # 初始化 last_message_id
                     
                     if message.text:
-                        last_message_id = message.id
+                       
                         tme_links = re.findall(r'me/\+[a-zA-Z0-9_\-]{15,17}|me/joinchat/[a-zA-Z0-9_\-]{15,18}', message.text)
                        
                         if tme_links:
                             for link in tme_links:
-                                await ly_class_instance.join_channel_from_link(client, "https://t."+link)
-                            # 跳过后续处理
+                                await ly_class_instance.join_channel_from_link(client, "https://t."+link)                       
                         elif entity.id == ly_class_instance.chat_id:
                             await fetch_media_from_enctext(message)
                             media_count = media_count + 1
