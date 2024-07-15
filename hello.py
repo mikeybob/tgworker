@@ -29,13 +29,15 @@ try:
         'phone_number': os.getenv('PHONE_NUMBER'),
         'session_name': os.getenv('API_ID') + 'session_name',
         'work_bot_id': os.getenv('WORK_BOT_ID'),
-        'work_chat_id': int(os.getenv('WORK_CHAT_ID')),
+        'work_chat_id': int(os.getenv('WORK_CHAT_ID', 0)),  # 默认值为0
         'public_bot_id': os.getenv('PUBLIC_BOT_ID'),
-        'warehouse_chat_id': int(os.getenv('WAREHOUSE_CHAT_ID')),
-        'link_chat_id': int(os.getenv('LINK_CHAT_ID'))
+        'warehouse_chat_id': int(os.getenv('WAREHOUSE_CHAT_ID', 0)),  # 默认值为0
+        'link_chat_id': int(os.getenv('LINK_CHAT_ID', 0))  # 默认值为0
     }
 
+    print(config)
 
+    
 
     # 创建 LYClass 实例
     tgbot = LYClass(client,config)
