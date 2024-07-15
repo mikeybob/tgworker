@@ -35,15 +35,27 @@ jobs:
         openssl aes-256-cbc -d -pbkdf2 -in "${{ secrets.API_ID }}session_name.session.enc" -out "${{ secrets.API_ID }}session_name.session" -pass pass:"${{ secrets.SESSION_PASSWORD }}"
             
 
-
-    - uses: actions/download-artifact@v4
-      continue-on-error: true
-
-    - name: Create last_read_message_id.json
+    - name: Get previous workflow run ID
+      id: get-previous-run-id
       run: |
-        if [ ! -f last_read_message_id.json ]; then
-          echo "{}" > last_read_message_id.json
-        fi
+        previous_run_id=$(gh run list --branch main --json databaseId --jq '.[1].databaseId')
+        echo "PREVIOUS_RUN_ID=$previous_run_id" >> $GITHUB_ENV
+
+    - name: Download previous result artifact if exists
+      id: download-artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: last_read_message
+        path: .
+      continue-on-error: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PREVIOUS_RUN_ID: ${{ env.PREVIOUS_RUN_ID }}
+
+
+
+
+
       
     - name: Display structure of downloaded files
       run: ls -R
