@@ -39,6 +39,7 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
           name: last_read_message
+          path: .
       continue-on-error: true
     - name: Display structure of downloaded files
       run: ls -R
@@ -51,9 +52,6 @@ jobs:
         else
           echo "last_read_message_id.json does not exist."
         fi      
-
-    - name: List directory contents
-      run: ls -R
 
     - name: Run Telethon script
       env:
