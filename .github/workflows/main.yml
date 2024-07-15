@@ -86,12 +86,6 @@ jobs:
       with:
         name: last_read_message
         path: last_read_message_id.json
-
-    - uses: actions/download-artifact@v4
-      continue-on-error: true
-
-    - name: Display structure of downloaded files
-      run: ls -R
     
 
         
