@@ -1,8 +1,9 @@
+
 name: Deploy Telethon 
 
 on: 
   schedule:
-   - cron: '*/30 * * * *'  # 每 30 分钟运行一次
+   - cron: '*/30 * * * *'  # 每 20 分钟运行一次
   push: 
     branches: 
       - master 
@@ -32,88 +33,12 @@ jobs:
         SESSION_PASSWORD: ${{ secrets.SESSION_PASSWORD }}
       run: |
         openssl aes-256-cbc -d -pbkdf2 -in "${{ secrets.API_ID }}session_name.session.enc" -out "${{ secrets.API_ID }}session_name.session" -pass pass:"${{ secrets.SESSION_PASSWORD }}"
-            
-
-    - name: List workflow runs
-        id: list-runs
-        uses: octokit/request-action@v2.x
-        with:
-          route: GET /repos/${{ github.repository_owner }}/${{ github.event.repository.name }}/actions/workflows/YOUR_WORKFLOW_ID/runs
-          owner: ${{ github.repository_owner }}
-          repo: ${{ github.event.repository.name }}
-          workflow_id: YOUR_WORKFLOW_ID  # 替换为实际的工作流ID
-          per_page: 1
-
-      - name: Set run_id
-        run: |
-          echo "run_id=$(jq -r '.workflow_runs[0].id' <<< ${{ steps.list-runs.outputs.data }})"
-          echo "run_id=${run_id}" >> $GITHUB_ENV
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: YOUR_ARTIFACT_NAME  # 替换为实际的工件名称
-          path: ./downloaded-artifact
-          run_id: ${{ env.run_id }}
-        continue-on-error: true
-
-
-
-
-
-
-
-      
-    - name: Display structure of downloaded files
-      run: ls -R
-      
-
-    - name: Check for last_read_message_id.json
-      run: |
-        if [ -f last_read_message_id.json ]; then
-          echo "last_read_message_id.json exists."
-        else
-          echo "last_read_message_id.json does not exist."
-        fi      
+    
 
     - name: Run Telethon script
       env:
         API_ID: ${{ secrets.API_ID }}
         API_HASH: ${{ secrets.API_HASH }}
         PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
-        WORK_BOT_ID: ${{ secrets.WORK_BOT_ID }}
-        WORK_CHAT_ID: ${{ secrets.WORK_CHAT_ID }}
-        PUBLIC_BOT_ID: ${{ secrets.PUBLIC_BOT_ID }}
-        WAREHOUSE_CHAT_ID: ${{ secrets.WAREHOUSE_CHAT_ID }}
       run: |
         python hello.py
-
-    - name: Check if last_read_message_id.json was created
-      run: |
-        if [ -f last_read_message_id.json ]; then
-          echo "last_read_message_id.json was created."
-        else
-          echo "last_read_message_id.json was not created."
-        fi
-
-    - uses: actions/download-artifact@v4
-      continue-on-error: true
-
-    - name: Display structure of downloaded files
-      run: ls -R
-
-
-    - name: Upload last_read_message_id.json artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: last_read_message
-        path: last_read_message_id.json
-
-    - uses: actions/download-artifact@v4
-      continue-on-error: true
-
-    - name: Display structure of downloaded files
-      run: ls -R
-    
-
-        
