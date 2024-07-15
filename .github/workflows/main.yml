@@ -41,7 +41,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: bot_artifact
-        path: ./last_read_message_id.json
+        path: ./
       continue-on-error: true
 
     - name: Check for last_read_message_id.json
