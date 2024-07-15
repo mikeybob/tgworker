@@ -21,116 +21,38 @@ session_name = api_id + 'session_name'  # 确保与上传的会话文件名匹�
 # 创建客户端
 client = TelegramClient(session_name, api_id, api_hash)
 
-config = {
-    'api_id': os.getenv('API_ID'),
-    'api_hash': os.getenv('API_HASH'),
-    'phone_number': os.getenv('PHONE_NUMBER'),
-    'session_name': os.getenv('API_ID') + 'session_name',
-    'work_bot_id': os.getenv('WORK_BOT_ID'),
-    'work_chat_id': os.getenv('WORK_CHAT_ID'),
-    'public_bot_id': os.getenv('PUBLIC_BOT_ID'),
-    'warehouse_chat_id': os.getenv('WAREHOUSE_CHAT_ID')
-}
 
-
-# 创建 LYClass 实例
-ly_class_instance = LYClass(config)
 try:
-    ly_class_instance.work_bot_id = os.getenv('WORK_BOT_ID')
-    ly_class_instance.work_chat_id = int(os.getenv('WORK_CHAT_ID'))
-    ly_class_instance.public_bot_id = os.getenv('PUBLIC_BOT_ID')
-    ly_class_instance.warehouse_chat_id = int(os.getenv('WAREHOUSE_CHAT_ID'))
+    config = {
+        'api_id': os.getenv('API_ID'),
+        'api_hash': os.getenv('API_HASH'),
+        'phone_number': os.getenv('PHONE_NUMBER'),
+        'session_name': os.getenv('API_ID') + 'session_name',
+        'work_bot_id': os.getenv('WORK_BOT_ID'),
+        'work_chat_id': int(os.getenv('WORK_CHAT_ID')),
+        'public_bot_id': os.getenv('PUBLIC_BOT_ID'),
+        'warehouse_chat_id': int(os.getenv('WAREHOUSE_CHAT_ID')),
+        'link_chat_id': int(os.getenv('LINK_CHAT_ID'))
+    }
+    # 创建 LYClass 实例
+    tgbot = LYClass(client,config)
 except ValueError:
     print("Environment variable WORK_CHAT_ID or WAREHOUSE_CHAT_ID is not a valid integer.")
     exit(1)
+    
 #max_process_time 設為 1200 秒，即 20 分鐘
-max_process_time = 1200  # 20分钟
-max_media_count = 15  # 15个媒体文件
-
-
-# 定义匹配函数
-def match_pattern(input_str):
-    for bot in wp_bot:
-        if re.search(bot['pattern'], input_str):
-            return bot
-    return None
-
-async def forward_encstr_to_encbot(message):
-    try:
-        enc_exist = False
-        print(f">>forward_encstr_to_encbot(1): {message.id}\n")
-        if message.text:
-            for bot in wp_bot:
-                pattern = re.compile(bot['pattern'])
-                matches = pattern.findall(message.text)
-                for match in matches:
-                    enc_exist=True
-                    async with client.conversation(ly_class_instance.work_bot_id) as conv:
-                        await conv.send_message(match)
-                        print(match)
-        else:
-            print(f"No matching pattern for message: {message.text} {message} \n")
-    except Exception as e:
-        print(f"An error occurred while processing message: {e} \n message:{message}\n")
-    finally:
-        if enc_exist:
-            await asyncio.sleep(3)
-        else:
-            await asyncio.sleep(0)
-
-async def forward_media_to_warehouse(message):
-    try:
-        print(f">>forward_media_to_warehouse(2): {message.id}\n")
-        if message.media:
-            if message.chat_id != ly_class_instance.warehouse_chat_id:
-                last_message_id = await ly_class_instance.send_message(client, message)
-                return last_message_id
-            else:
-                print(f"Message is from warehouse chat, not forwarding: {message.id}\n")
-        else:
-            print(f"No matching pattern for message: {message.text} {message} \n")
-    except Exception as e:
-        print(f"An error occurred while processing message: {e} \n message:{message}\n")
-    finally:
-        await asyncio.sleep(3)
-    return message.id
-
-# 定义消息处理函数
-async def fetch_media_from_enctext(message):
-    try:
-        print(f">>fetch_media_from_enctext(3): {message.id}\n")
-        if message.text:
-            bot = match_pattern(message.text)
-            title = bot['title'] if bot else None
-            if title:
-                handler = getattr(ly_class_instance, title, None)
-                if handler:
-                    if asyncio.iscoroutinefunction(handler):
-                        await handler(client, message)
-                    else:
-                        handler(message)
-                else:
-                    print(f"No handler found for title: {title}\n")
-        else:
-            print(f"No matching pattern for message: {message.text} {message} \n")
-    except Exception as e:
-        print(f"An error occurred while processing message: {e} \n message:{message}\n")
-    finally:
-        if title:
-            await asyncio.sleep(5)
-        else:
-            await asyncio.sleep(0)
-
+max_process_time = 15  # 20分钟
+max_media_count = 2  # 15个媒体文件
 
 
 async def main():
     await client.start(phone_number)
     
     try:
-        entity = await client.get_entity(ly_class_instance.work_chat_id)
-        ly_class_instance.chat_id = entity.id
+        entity = await client.get_entity(int(tgbot.config['work_chat_id']))
+        tgbot.chat_id = entity.id
     except ValueError as e:
-        print(f"Failed to get entity for chat_id {ly_class_instance.work_chat_id}: {e}")
+        print(f"Failed to get entity for chat_id {tgbot.config['work_chat_id']}: {e}")
         return
 
     start_time = time.time()
@@ -139,13 +61,15 @@ async def main():
     while True:
         async for dialog in client.iter_dialogs():
             entity = dialog.entity
-            this_chat_id = '-100'+str(entity.id)
-            # 跳过来自 WAREHOUSE_CHAT_ID 的对话
-            if this_chat_id == str(ly_class_instance.warehouse_chat_id):
-                continue
-            # if this_chat_id == str(ly_class_instance.work_chat_id):
-                # continue
            
+            # 跳过来自 WAREHOUSE_CHAT_ID 的对话
+            if entity.id == tgbot.config['warehouse_chat_id']:
+                continue
+           
+            # 如果entity.id 是属于 wp_bot 下的 任一 id, 则跳过
+            if entity.id in [int(bot['id']) for bot in wp_bot]:
+                continue
+
             if str(entity.id) == '2131062766':
                 continue
                 
@@ -159,35 +83,36 @@ async def main():
             else:
                 entity_title = f'Unknown entity {entity.id}'
                 
-            print(f"\nProcessing entity: {this_chat_id} - {entity_title}\n")
+            print(f"\nProcessing entity: {entity.id} - {entity_title}\n")
 
             if dialog.unread_count >= 0 and (dialog.is_user or dialog.is_group or dialog.is_channel):
-                if this_chat_id == str(ly_class_instance.work_chat_id):
+                if entity.id == tgbot.config['work_chat_id']:
                     last_read_message_id = 0
                 else:
-                    last_read_message_id = ly_class_instance.load_last_read_message_id(entity.id)
+                    last_read_message_id = tgbot.load_last_read_message_id(entity.id)
 
                 print(f">Reading messages from entity {entity.id} - {last_read_message_id}\n")
                 async for message in client.iter_messages(entity, min_id=last_read_message_id, limit=30, reverse=True, filter=InputMessagesFilterEmpty()):
                     last_message_id = message.id  # 初始化 last_message_id
                     
                     if message.text:
-                       
                         tme_links = re.findall(r'me/\+[a-zA-Z0-9_\-]{15,17}|me/joinchat/[a-zA-Z0-9_\-]{15,18}', message.text)
-                       
                         if tme_links:
                             for link in tme_links:
-                                await ly_class_instance.join_channel_from_link(client, "https://t."+link)                       
-                        elif entity.id == ly_class_instance.chat_id:
-                            await fetch_media_from_enctext(message)
+                                if entity.id == tgbot.config['link_chat_id']:
+                                    await tgbot.join_channel_from_link(client, "https://t."+link)    
+                                else:
+                                    await client.send_message(tgbot.config['work_bot_id'], f"https://t.{link}")                 
+                        elif entity.id == tgbot.config['work_chat_id']:
+                            await tgbot.process_by_check_text(message,'tobot')
                             media_count = media_count + 1
                         elif dialog.is_group or dialog.is_channel:
-                            await forward_encstr_to_encbot(message)
+                           await tgbot.process_by_check_text(message,'encstr')
                     elif message.media:
-                        if ly_class_instance.warehouse_chat_id!=0 and entity.id != ly_class_instance.chat_id and entity.id != ly_class_instance.warehouse_chat_id:
-                            last_message_id = await forward_media_to_warehouse(message)
+                        if tgbot.config['warehouse_chat_id']!=0 and entity.id != tgbot.config['work_chat_id'] and entity.id != tgbot.config['warehouse_chat_id']:
+                            last_message_id = await tgbot.forward_media_to_warehouse(client,message)
                             media_count = media_count + 1
-                    ly_class_instance.save_last_read_message_id(entity.id, last_message_id)
+                    tgbot.save_last_read_message_id(entity.id, last_message_id)
                     
                     if media_count >= max_media_count:
                         break

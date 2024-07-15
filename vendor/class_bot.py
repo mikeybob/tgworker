@@ -5,42 +5,46 @@ import os
 import re
 from telethon.tl.functions.channels import JoinChannelRequest
 from telethon.tl.functions.messages import ImportChatInviteRequest
+from vendor.wpbot import wp_bot  # 导入 wp_bot
 
 class LYClass:
 
     # 持久化存储最后读取的消息 ID
     LAST_READ_MESSAGE_FILE = "last_read_message_id.json"
 
-    def __init__(self, config):
+    def __init__(self, client, config):
         self.config = config 
+        self.client = client
         
 
-    # 查找文字，若存在匹配的字串，則根據傳入的參數mode來處理，若mode=bot,則用 fetch_media_from_enctext 函數處理。若 mode=encstr，則用 forward_encstr_to_encbot 函數處理; 
-    async def _from_enctext(self,message,mode):
+    # 查找文字，若存在匹配的字串，則根據傳入的參數mode來處理，若mode=tobot,則用 fetch_media_from_enctext 函數處理。若 mode=encstr，則用 forward_encstr_to_encbot 函數處理; 
+    async def process_by_check_text(self,message,mode):
         try:
-            print(f">>fetch_media_from_enctext(3): {message.id}\n")
+            enc_exist = False
+            
             if message.text:
-                bot = match_pattern(message.text)
-                title = bot['title'] if bot else None
-                if title:
-                    handler = getattr(ly_class_instance, title, None)
-                    if handler:
-                        if asyncio.iscoroutinefunction(handler):
-                            await handler(client, message)
-                        else:
-                            handler(message)
-                    else:
-                        print(f"No handler found for title: {title}\n")
+                for bot in wp_bot:
+                    pattern = re.compile(bot['pattern'])
+                    matches = pattern.findall(message.text)
+                    for match in matches:
+                        enc_exist=True
+                        if mode == 'encstr':
+                            print(f">>send to QQ: {message.id}\n")
+                            async with self.client.conversation(self.config['work_bot_id']) as conv:
+                                await conv.send_message(match)
+                                print(match)
+                        elif mode == 'tobot':
+                            print(f">>send to Enctext BOT: {message.id}\n")
+                            await self.wpbot(self.client, message, bot['bot_name'])
             else:
                 print(f"No matching pattern for message: {message.text} {message} \n")
         except Exception as e:
-            print(f"An error occurred while processing message: {e} \n message:{message}\n")
+            print(f">>(1)An error occurred while processing message: {e} \n message:{message}\n")
         finally:
-            if title:
+            if enc_exist:
                 await asyncio.sleep(5)
             else:
                 await asyncio.sleep(0)
-
 
     async def send_message(self, client, message):
         last_message_id = message.id
@@ -87,7 +91,7 @@ class LYClass:
             album_messages = await client.get_messages(message.peer_id, limit=100)
             album = [msg for msg in album_messages if msg.grouped_id == message.grouped_id]
             if album:
-                await client.send_file(self.warehouse_chat_id, album, reply_to=message.id, caption=caption_text, parse_mode='html')
+                await client.send_file(self.config['warehouse_chat_id'], album, reply_to=message.id, caption=caption_text, parse_mode='html')
                 print("Forwarded album.")
                 last_message_id = album[-1].id  # 获取相册中最后一条消息的ID
         elif isinstance(message.media, types.MessageMediaDocument):
@@ -95,27 +99,27 @@ class LYClass:
             if mime_type.startswith('video/'):
                 # 处理视频
                 video = message.media.document
-                await client.send_file(self.warehouse_chat_id, video, reply_to=message.id, caption=caption_text, parse_mode='html')
+                await client.send_file(self.config['warehouse_chat_id'], video, reply_to=message.id, caption=caption_text, parse_mode='html')
                 print("Forwarded video.")
                 
                 # 调用新的函数
-                #await self.send_video_to_filetobot_and_beachboy807bot(client, video, message)
+                #await self.send_video_to_filetobot_and_publish(client, video, message)
             else:
                 # 处理文档
                 document = message.media.document
-                await client.send_file(self.warehouse_chat_id, document, reply_to=message.id, caption=caption_text, parse_mode='html')
+                await client.send_file(self.config['warehouse_chat_id'], document, reply_to=message.id, caption=caption_text, parse_mode='html')
                 print("Forwarded document.")
         elif isinstance(message.media, types.MessageMediaPhoto):
             # 处理图片
             photo = message.media.photo
-            await client.send_file(self.warehouse_chat_id, photo, reply_to=message.id, caption=caption_text, parse_mode='html')
+            await client.send_file(self.config['warehouse_chat_id'], photo, reply_to=message.id, caption=caption_text, parse_mode='html')
             print("Forwarded photo.")
         else:
             print("Received media, but not a document, video, photo, or album.")
         
         return last_message_id
 
-    async def send_video_to_filetobot_and_beachboy807bot(self, client, video, original_message):
+    async def send_video_to_filetobot_and_publish(self, client, video, original_message):
         chat_id = self.chat_id
         original_message_id = original_message.id
 
@@ -137,15 +141,20 @@ class LYClass:
                 return
 
             # 将 filetobot 的响应内容传送给 beachboy807bot，并设置 caption 为原始消息的文本
-            async with client.conversation('beachboy807bot') as beachboy807bot_conv:
+            async with client.conversation(self.config['public_bot_id']) as publicbot_conv:
                 caption_text = "|_SendToBeach_|\n"+original_message.text+"\n"+filetobot_response.message
-                await beachboy807bot_conv.send_file(filetobot_response.media, caption=caption_text)
-                print("Forwarded filetobot response to beachboy807bot with caption.")
+                await publicbot_conv.send_file(filetobot_response.media, caption=caption_text)
+                print("Forwarded filetobot response to publish bot with caption.")
 
     async def wpbot(self, client, message, bot_username):
         try:
-            chat_id = self.chat_id
+            chat_id = self.config['work_chat_id']
             async with client.conversation(bot_username) as conv:
+                # 根据bot_username 找到 wp_bot 中对应的 bot_name = bot_username 的字典
+                bot = next((bot for bot in wp_bot if bot['bot_name'] == bot_username), None)
+                if bot['mode'] == 'link':
+                    message.text = '/start ' + message.text
+
                 # 发送消息到机器人
                 forwarded_message = await conv.send_message(message.text)
                 
@@ -168,14 +177,14 @@ class LYClass:
                             print("Forwarded video.")
                             
                             # 调用新的函数
-                            await self.send_video_to_filetobot_and_beachboy807bot(client, video, message)
+                            await self.send_video_to_filetobot_and_publish(client, video, message)
                         else:
                             # 处理文档
                             document = response.media.document
                             await client.send_file(chat_id, document, reply_to=message.id)
 
                             caption_text = "|_SendToBeach_|\n"+message.text
-                            await client.send_file("beachboy807bot", document, caption=caption_text)
+                            await client.send_file(self.config['public_bot_is'], document, caption=caption_text)
                             print("Forwarded document.")
                     elif isinstance(response.media, types.MessageMediaPhoto):
                         # 处理图片
@@ -183,20 +192,22 @@ class LYClass:
                         await client.send_file(chat_id, photo, reply_to=message.id)
 
                         caption_text = "|_SendToBeach_|\n"+message.text
-                        await client.send_file("beachboy807bot", photo, caption=caption_text)
+                        await client.send_file(self.config['public_bot_is'], photo, caption=caption_text)
                         print("Forwarded photo.")
                     else:
                         print("Received media, but not a document, video, or photo.")
                 elif response.text:
                     # 处理文本
                     if response.text == "在您发的这条消息中，没有代码可以被解析":
-                        await self.showfiles(client, message)
+                        await self.wpbot(self.client, message, 'ShowFilesBot')
+                       
                     elif response.text == "💔抱歉，未找到可解析内容。":
                         await client.send_message(chat_id, response.text, reply_to=message.id)
                     elif response.text == "此机器人面向外国用户使用，访问 @MediaBKHome 获取面向国内用户使用的机器人":
-                        await self.showfiles(client, message)
+                        await self.wpbot(self.client, message, 'ShowFilesBot')
+                        
                     elif response.text == "access @MediaBKHome to get media backup bot for non-chinese-speaking user":
-                        await self.mediabk2(client, message)
+                        await self.wpbot(self.client, message, 'ShowFilesBot')
                     else:
                         print("Received text response: "+response.text)
                     print("Forwarded text.")
@@ -205,56 +216,56 @@ class LYClass:
         except Exception as e:
             print(f"\rAn error occurred: {e}\n")
 
-    async def blgg(self, client, message):
-        bot_username = 'FilesDrive_BLGG_bot'
-        await self.wpbot(client, message, bot_username)
+    # async def blgg(self, client, message):
+    #     bot_username = 'FilesDrive_BLGG_bot'
+    #     await self.wpbot(client, message, bot_username)
 
-    async def showfiles(self, client, message):
-        bot_username = 'ShowFilesBot'
-        await self.wpbot(client, message, bot_username)
+    # async def showfiles(self, client, message):
+    #     bot_username = 'ShowFilesBot'
+    #     await self.wpbot(client, message, bot_username)
 
-    async def datapan(self, client, message):
-        bot_username = 'datapanbot'
-        await self.wpbot(client, message, bot_username)
+    # async def datapan(self, client, message):
+    #     bot_username = 'datapanbot'
+    #     await self.wpbot(client, message, bot_username)
 
-    async def mediabk(self, client, message):
-        bot_username = 'MediaBK2Bot'
-        await self.wpbot(client, message, bot_username)
+    # async def mediabk(self, client, message):
+    #     bot_username = 'MediaBK2Bot'
+    #     await self.wpbot(client, message, bot_username)
 
-    async def mediabk2(self, client, message):
-        bot_username = 'MediaBKBK1Bot'
-        await self.wpbot(client, message, bot_username)
+    # async def mediabk2(self, client, message):
+    #     bot_username = 'MediaBKBK1Bot'
+    #     await self.wpbot(client, message, bot_username)
 
-    async def filesave(self, client, message):
-        bot_username = 'FileSaveNewBot'
-        await self.wpbot(client, message, bot_username)
+    # async def filesave(self, client, message):
+    #     bot_username = 'FileSaveNewBot'
+    #     await self.wpbot(client, message, bot_username)
 
-    async def wangpan(self, client, message):
-        bot_username = 'WangPanBOT'
-        await self.wpbot(client, message, bot_username)
+    # async def wangpan(self, client, message):
+    #     bot_username = 'WangPanBOT'
+    #     await self.wpbot(client, message, bot_username)
 
-    async def filetobot(self, client, message):
-        bot_username = 'filetobot'
-        message.text = "/start " + message.text
-        await self.wpbot(client, message, bot_username)
+    # async def filetobot(self, client, message):
+    #     bot_username = 'filetobot'
+    #     message.text = "/start " + message.text
+    #     await self.wpbot(client, message, bot_username)
 
-    async def filein(self, client, message):
-        bot_username = 'fileinbot'
-        message.text = "/start " + message.text
-        await self.wpbot(client, message, bot_username)
+    # async def filein(self, client, message):
+    #     bot_username = 'fileinbot'
+    #     message.text = "/start " + message.text
+    #     await self.wpbot(client, message, bot_username)
 
-    async def fileoffrm(self, client, message):
-        bot_username = 'fileoffrm_bot'
-        message.text = "/start " + message.text
-        await self.wpbot(client, message, bot_username)
+    # async def fileoffrm(self, client, message):
+    #     bot_username = 'fileoffrm_bot'
+    #     message.text = "/start " + message.text
+    #     await self.wpbot(client, message, bot_username)
 
-    async def filesave(self, client, message):
-        bot_username = 'FileSaveNewBot'
-        await self.wpbot(client, message, bot_username)
+    # async def filesave(self, client, message):
+    #     bot_username = 'FileSaveNewBot'
+    #     await self.wpbot(client, message, bot_username)
 
-    async def filespan1(self, client, message):
-        bot_username = 'FilesPan1Bot'
-        await self.wpbot(client, message, bot_username)
+    # async def filespan1(self, client, message):
+    #     bot_username = 'FilesPan1Bot'
+    #     await self.wpbot(client, message, bot_username)
 
     def save_last_read_message_id(self, chat_id, message_id):
         data = {str(chat_id): message_id}
@@ -275,7 +286,7 @@ class LYClass:
 
     async def join_channel_from_link(self, client, invite_link):
         try:
-            print(f"Joining channel from link: {invite_link}")
+            # print(f"Joining channel from link: {invite_link}")
             # 提取邀请链接中的哈希部分
             invite_hash = invite_link.split('/')[-1]
 
@@ -283,7 +294,25 @@ class LYClass:
                 invite_hash = invite_hash[1:]
             
             # 通过邀请链接加入群组
-            # updates = await client(ImportChatInviteRequest(invite_hash))
-            # print(f"成功加入群组: {updates.chats[0].title}")
+            updates = await client(ImportChatInviteRequest(invite_hash))
+            print(f"成功加入群组: {updates.chats[0].title}")
         except Exception as e:
             print(f"加入群组失败: {e}")
+
+    async def forward_media_to_warehouse(self,client,message):
+        try:
+            print(f">>forward_media_to_WH: {message.id}\n")
+            if message.media:
+                if message.chat_id != self.config['warehouse_chat_id']:
+                    print(f"Forwarding media to warehouse chat: {message.id}\n")
+                    last_message_id = await self.send_message(client, message)
+                    return last_message_id
+                else:
+                    print(f"Message is from warehouse chat, not forwarding: {message.id}\n")
+            else:
+                print(f"No matching pattern for message: {message.text} {message} \n")
+        except Exception as e:
+            print(f">>(2)An error occurred while processing message: {e} \n message:{message}\n")
+        finally:
+            await asyncio.sleep(3)
+        return message.id
