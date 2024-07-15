@@ -40,8 +40,8 @@ jobs:
       id: download-artifact
       uses: actions/download-artifact@v4
       with:
-        name: last_read_message_id.json
-        path: .
+        name: last_read_message
+        path: last_read_message_id.json
       continue-on-error: true
 
     - name: Check for last_read_message_id.json
@@ -79,7 +79,7 @@ jobs:
     - name: Upload last_read_message_id.json artifact
       uses: actions/upload-artifact@v4
       with:
-        name: last_read_message_id.json
+        name: last_read_message
         path: last_read_message_id.json
 
     - uses: actions/download-artifact@v4
