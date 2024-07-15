@@ -39,9 +39,10 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
           name: last_read_message
+      continue-on-error: true
     - name: Display structure of downloaded files
       run: ls -R
-      continue-on-error: true
+      
 
     - name: Check for last_read_message_id.json
       run: |
