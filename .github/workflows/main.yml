@@ -35,22 +35,30 @@ jobs:
         openssl aes-256-cbc -d -pbkdf2 -in "${{ secrets.API_ID }}session_name.session.enc" -out "${{ secrets.API_ID }}session_name.session" -pass pass:"${{ secrets.SESSION_PASSWORD }}"
             
 
-    - name: Get previous workflow run ID
-      id: get-previous-run-id
-      run: |
-        previous_run_id=$(gh run list --branch main --json databaseId --jq '.[1].databaseId')
-        echo "PREVIOUS_RUN_ID=$previous_run_id" >> $GITHUB_ENV
+    - name: List workflow runs
+        id: list-runs
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/${{ github.repository_owner }}/${{ github.event.repository.name }}/actions/workflows/YOUR_WORKFLOW_ID/runs
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          workflow_id: YOUR_WORKFLOW_ID  # 替换为实际的工作流ID
+          per_page: 1
 
-    - name: Download previous result artifact if exists
-      id: download-artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: last_read_message
-        path: .
-      continue-on-error: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PREVIOUS_RUN_ID: ${{ env.PREVIOUS_RUN_ID }}
+      - name: Set run_id
+        run: |
+          echo "run_id=$(jq -r '.workflow_runs[0].id' <<< ${{ steps.list-runs.outputs.data }})"
+          echo "run_id=${run_id}" >> $GITHUB_ENV
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: YOUR_ARTIFACT_NAME  # 替换为实际的工件名称
+          path: ./downloaded-artifact
+          run_id: ${{ env.run_id }}
+        continue-on-error: true
+
+
 
 
 
