@@ -41,6 +41,13 @@ jobs:
           name: last_read_message
           path: .
       continue-on-error: true
+
+    - name: Create last_read_message_id.json
+      run: |
+        if [ ! -f last_read_message_id.json ]; then
+          echo "{}" > last_read_message_id.json
+        fi
+      
     - name: Display structure of downloaded files
       run: ls -R
       
