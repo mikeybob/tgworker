@@ -41,8 +41,8 @@ except ValueError:
     exit(1)
     
 #max_process_time 設為 1200 秒，即 20 分鐘
-max_process_time = 15  # 20分钟
-max_media_count = 2  # 15个媒体文件
+max_process_time = 1200  # 20分钟
+max_media_count = 10  # 10个媒体文件
 
 
 async def main():
