@@ -29,11 +29,14 @@ try:
         'phone_number': os.getenv('PHONE_NUMBER'),
         'session_name': os.getenv('API_ID') + 'session_name',
         'work_bot_id': os.getenv('WORK_BOT_ID'),
-        'work_chat_id': (os.getenv('WORK_CHAT_ID')),
+        'work_chat_id': int(os.getenv('WORK_CHAT_ID')),
         'public_bot_id': os.getenv('PUBLIC_BOT_ID'),
-        'warehouse_chat_id': (os.getenv('WAREHOUSE_CHAT_ID')),
-        'link_chat_id': (os.getenv('LINK_CHAT_ID'))
+        'warehouse_chat_id': int(os.getenv('WAREHOUSE_CHAT_ID')),
+        'link_chat_id': int(os.getenv('LINK_CHAT_ID'))
     }
+
+
+
     # 创建 LYClass 实例
     tgbot = LYClass(client,config)
 except ValueError:
@@ -49,7 +52,7 @@ async def main():
     await client.start(phone_number)
     
     try:
-        entity = await client.get_entity('-100'+str(tgbot.config['work_chat_id']))
+        entity = await client.get_entity(tgbot.config['work_chat_id'])
         tgbot.chat_id = entity.id
     except ValueError as e:
         print(f"Failed to get entity for chat_id {tgbot.config['work_chat_id']}: {e}")
