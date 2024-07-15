@@ -35,10 +35,6 @@ try:
         'link_chat_id': int(os.getenv('LINK_CHAT_ID', 0))  # 默认值为0
     }
 
-    
-
-    
-
     # 创建 LYClass 实例
     tgbot = LYClass(client,config)
 except ValueError:
@@ -52,14 +48,6 @@ max_media_count = 10  # 10个媒体文件
 
 async def main():
     await client.start(phone_number)
-    
-    # try:
-    #     chat_id = "-100"+str(tgbot.config['work_chat_id'])
-    #     entity = await client.get_entity(chat_id)
-    #     tgbot.chat_id = entity.id
-    # except ValueError as e:
-    #     print(f"Failed to get entity for chat_id {tgbot.config['work_chat_id']}: {e}")
-    #     return
 
     start_time = time.time()
     media_count = 0
