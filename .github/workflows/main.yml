@@ -34,11 +34,7 @@ jobs:
       run: |
         openssl aes-256-cbc -d -pbkdf2 -in "${{ secrets.API_ID }}session_name.session.enc" -out "${{ secrets.API_ID }}session_name.session" -pass pass:"${{ secrets.SESSION_PASSWORD }}"
             
-    - name: Remove existing last_read_message_id.json
-      run: |
-        if [ -f last_read_message_id.json ]; then
-          rm last_read_message_id.json
-        fi
+
 
     - name: Download last_read_message_id artifact if exists
       id: download-artifact
@@ -56,7 +52,8 @@ jobs:
           echo "last_read_message_id.json does not exist."
         fi      
 
-
+    - name: List directory contents
+      run: ls -la
 
     - name: Run Telethon script
       env:
