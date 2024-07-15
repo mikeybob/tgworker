@@ -80,4 +80,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: last_read_message_id
-        path: last_read_message_id.json
+        path: ./last_read_message_id.json
