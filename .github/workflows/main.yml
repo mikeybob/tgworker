@@ -2,7 +2,7 @@ name: Deploy Telethon
 
 on: 
   schedule:
-   - cron: '*/59 * * * *'  # 每 30 分钟运行一次
+   - cron: '*/30 * * * *'  # 每 30 分钟运行一次
   push: 
     branches: 
       - master 
@@ -41,7 +41,7 @@ jobs:
           const runs = await github.rest.actions.listWorkflowRuns({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            workflow_id: 'main.yml',  // 替换为实际工作流文件名
+            workflow_id: 'main.yml',  
             per_page: 1,
             status: 'success',
           });
