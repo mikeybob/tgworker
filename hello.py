@@ -64,8 +64,8 @@ async def main():
             if entity.id in [int(bot['id']) for bot in wp_bot]:
                 continue
 
-            # 设一个黑名单列表，如果 entity.id 在黑名单列表中，则跳过
-            blacklist = [2131062766, 1766929647, 1781549078]  # Example blacklist with entity IDs
+            # 设一个黑名单列表，如果 entity.id 在黑名单列表中，则跳过 
+            blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646]  # Example blacklist with entity IDs
 
             if entity.id in blacklist:
                 continue                
@@ -79,9 +79,11 @@ async def main():
             else:
                 entity_title = f'Unknown entity {entity.id}'
                 
-            print(f"\nProcessing entity: {entity.id} - {entity_title}\n")
+            
 
-            if dialog.unread_count >= 0 and (dialog.is_user or dialog.is_group or dialog.is_channel):
+            if dialog.unread_count >= 0 and (dialog.is_group or dialog.is_channel):
+                
+                
 
                 time.sleep(0.5)  # 每次请求之间等待0.5秒
 
@@ -90,13 +92,14 @@ async def main():
                 else:
                     last_read_message_id = tgbot.load_last_read_message_id(entity.id)
 
-                print(f">Reading messages from entity {entity.id} - {last_read_message_id}\n")
+                print(f">Reading messages from entity {entity.id}/{entity_title} - {last_read_message_id}\n")
                 async for message in client.iter_messages(entity, min_id=last_read_message_id, limit=50, reverse=True, filter=InputMessagesFilterEmpty()):
-                    if message.id < last_read_message_id:
-                        continue
-
-                    last_message_id = message.id  # 初始化 last_message_id
                     
+                    if message.id <= last_read_message_id:
+                        continue
+                   
+                    last_message_id = message.id  # 初始化 last_message_id
+                   
 
 
                     if message.text:
@@ -121,9 +124,13 @@ async def main():
                                 break
 
                             last_message_id = await tgbot.forward_media_to_warehouse(client,message)
+                            print(f"last_message_id: {last_message_id}")
                             media_count = media_count + 1
+                            
+                            last_read_message_id = last_message_id
+                           
                     tgbot.save_last_read_message_id(entity.id, last_message_id)
-                    last_read_message_id = last_message_id
+                   
 
 
             elapsed_time = time.time() - start_time

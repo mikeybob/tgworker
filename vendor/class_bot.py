@@ -3,6 +3,7 @@ import asyncio
 import json
 import os
 import re
+from telethon.errors import WorkerBusyTooLongRetryError
 from telethon.tl.functions.channels import JoinChannelRequest
 from telethon.tl.functions.messages import ImportChatInviteRequest
 from vendor.wpbot import wp_bot  # 导入 wp_bot
@@ -86,42 +87,53 @@ class LYClass:
                 caption_parts.append(f"Original: <a href='tg://user?id={message.from_id.user_id}'>{sender_title}</a>")
 
         caption_text = "\n".join(caption_parts)
-
-        if hasattr(message, 'grouped_id') and message.grouped_id:
-            # 获取相册中的所有消息
-            album_messages = await client.get_messages(message.peer_id, limit=100)
-            album = [msg for msg in album_messages if msg.grouped_id == message.grouped_id]
-            if album:
-                await client.send_file(self.config['warehouse_chat_id'], album, reply_to=message.id, caption=caption_text, parse_mode='html')
-                print("Forwarded album.")
-                last_message_id = album[-1].id  # 获取相册中最后一条消息的ID
-        elif isinstance(message.media, types.MessageMediaDocument):
-            mime_type = message.media.document.mime_type
-            if mime_type.startswith('video/'):
-                # 处理视频
-                video = message.media.document
-                await client.send_file(self.config['warehouse_chat_id'], video, reply_to=message.id, caption=caption_text, parse_mode='html')
-                print("Forwarded video.")
-                
-                # 调用新的函数
-                #await self.send_video_to_filetobot_and_publish(client, video, message)
+        try:
+            if hasattr(message, 'grouped_id') and message.grouped_id:
+                # 获取相册中的所有消息
+                album_messages = await client.get_messages(message.peer_id, limit=100)
+                album = [msg for msg in album_messages if msg.grouped_id == message.grouped_id]
+                if album:
+                    await asyncio.sleep(0.5)  # 间隔80秒
+                    last_message_id = max(row.id for row in album)
+                    await client.send_file(self.config['warehouse_chat_id'], album, reply_to=message.id, caption=caption_text, parse_mode='html')
+                    print(f"Forwarded album:{last_message_id}")
+                    # print(f"{message.id}")
+                    # print(f"{album[0].id}")
+                    # print(f"{album[-1].id}")
+                    # last_message_id = album[-1].id  # 获取相册中最后一条消息的ID
+                    # print(f"Forwarded album:{last_message_id}")
+                    #取得阵列album中的id最大值
+                    
+            elif isinstance(message.media, types.MessageMediaDocument):
+                mime_type = message.media.document.mime_type
+                if mime_type.startswith('video/'):
+                    # 处理视频
+                    video = message.media.document
+                    await client.send_file(self.config['warehouse_chat_id'], video, reply_to=message.id, caption=caption_text, parse_mode='html')
+                    print("Forwarded video.")
+                    
+                    # 调用新的函数
+                    #await self.send_video_to_filetobot_and_publish(client, video, message)
+                else:
+                    # 处理文档
+                    document = message.media.document
+                    await client.send_file(self.config['warehouse_chat_id'], document, reply_to=message.id, caption=caption_text, parse_mode='html')
+                    print("Forwarded document.")
+            elif isinstance(message.media, types.MessageMediaPhoto):
+                # 处理图片
+                photo = message.media.photo
+                await client.send_file(self.config['warehouse_chat_id'], photo, reply_to=message.id, caption=caption_text, parse_mode='html')
+                print("Forwarded photo.")
             else:
-                # 处理文档
-                document = message.media.document
-                await client.send_file(self.config['warehouse_chat_id'], document, reply_to=message.id, caption=caption_text, parse_mode='html')
-                print("Forwarded document.")
-        elif isinstance(message.media, types.MessageMediaPhoto):
-            # 处理图片
-            photo = message.media.photo
-            await client.send_file(self.config['warehouse_chat_id'], photo, reply_to=message.id, caption=caption_text, parse_mode='html')
-            print("Forwarded photo.")
-        else:
-            print("Received media, but not a document, video, photo, or album.")
-        
+                print("Received media, but not a document, video, photo, or album.")
+        except WorkerBusyTooLongRetryError:
+            print(f"WorkerBusyTooLongRetryError encountered. Skipping message {message.id}.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
         return last_message_id
 
     async def send_video_to_filetobot_and_publish(self, client, video, original_message):
-        chat_id = self.chat_id
+        
         original_message_id = original_message.id
 
         # 将视频发送到 filetobot 并等待响应
@@ -137,7 +149,7 @@ class LYClass:
                         print("Received text response, waiting for media...")
 
             except asyncio.TimeoutError:
-                await client.send_message(chat_id, "filetobot timeout", reply_to=original_message_id)
+                await client.send_message(self.config['work_chat_id'], "filetobot timeout", reply_to=original_message_id)
                 print("filetobot response timeout.")
                 return
 
