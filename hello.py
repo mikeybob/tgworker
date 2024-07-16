@@ -101,6 +101,8 @@ async def main():
                 async for message in client.iter_messages(entity, min_id=last_read_message_id, limit=50, reverse=True, filter=InputMessagesFilterEmpty()):
                     last_message_id = message.id  # 初始化 last_message_id
                     
+
+
                     if message.text:
                         tme_links = re.findall(r'me/\+[a-zA-Z0-9_\-]{15,17}|me/joinchat/[a-zA-Z0-9_\-]{15,18}', message.text)
                         if tme_links:
@@ -110,32 +112,34 @@ async def main():
                                 else:
                                     await client.send_message(tgbot.config['work_bot_id'], f"https://t.{link}")                 
                         elif entity.id == tgbot.config['work_chat_id']:
+                            if media_count >= max_media_count:
+                                break
+
                             await tgbot.process_by_check_text(message,'tobot')
                             media_count = media_count + 1
                         elif dialog.is_group or dialog.is_channel:
                            await tgbot.process_by_check_text(message,'encstr')
                     elif message.media:
                         if tgbot.config['warehouse_chat_id']!=0 and entity.id != tgbot.config['work_chat_id'] and entity.id != tgbot.config['warehouse_chat_id']:
+                            if media_count >= max_media_count:
+                                break
+
                             last_message_id = await tgbot.forward_media_to_warehouse(client,message)
                             media_count = media_count + 1
                     tgbot.save_last_read_message_id(entity.id, last_message_id)
                     
-                    if media_count >= max_media_count:
-                        break
+
 
             elapsed_time = time.time() - start_time
             if elapsed_time > max_process_time:  
-                break
-
-
-            if media_count >= max_media_count:
-                print(f"Media count exceeded {max_media_count}. Stopping.\n")
-                break
+                break                
 
         elapsed_time = time.time() - start_time
         if elapsed_time > max_process_time:  
             print(f"Execution time exceeded {max_process_time} seconds. Stopping.")
             break
+
+
 
         print("Execution time is " + str(elapsed_time) + " seconds. Continuing next cycle... after 80 seconds.")
         await asyncio.sleep(80)  # 间隔80秒
