@@ -185,7 +185,7 @@ class LYClass:
                             await client.send_file(chat_id, document, reply_to=message.id)
 
                             caption_text = "|_SendToBeach_|\n"+message.text
-                            await client.send_file(self.config['public_bot_is'], document, caption=caption_text)
+                            await client.send_file(self.config['public_bot_id'], document, caption=caption_text)
                             print("Forwarded document.")
                     elif isinstance(response.media, types.MessageMediaPhoto):
                         # 处理图片
@@ -193,7 +193,7 @@ class LYClass:
                         await client.send_file(chat_id, photo, reply_to=message.id)
 
                         caption_text = "|_SendToBeach_|\n"+message.text
-                        await client.send_file(self.config['public_bot_is'], photo, caption=caption_text)
+                        await client.send_file(self.config['public_bot_id'], photo, caption=caption_text)
                         print("Forwarded photo.")
                     else:
                         print("Received media, but not a document, video, or photo.")
