@@ -68,17 +68,7 @@ async def main():
             blacklist = [2131062766, 1766929647, 1781549078]  # Example blacklist with entity IDs
 
             if entity.id in blacklist:
-                continue
-
-
-
-
-            if entity.id == 2131062766 or entity.id == 1766929647:
-                continue
-
-
-         
-                
+                continue                
                 
            
             # 打印处理的实体名称（频道或群组的标题）
@@ -92,6 +82,9 @@ async def main():
             print(f"\nProcessing entity: {entity.id} - {entity_title}\n")
 
             if dialog.unread_count >= 0 and (dialog.is_user or dialog.is_group or dialog.is_channel):
+
+                time.sleep(0.5)  # 每次请求之间等待0.5秒
+
                 if entity.id == tgbot.config['work_chat_id']:
                     last_read_message_id = 0
                 else:
