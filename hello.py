@@ -64,8 +64,20 @@ async def main():
             if entity.id in [int(bot['id']) for bot in wp_bot]:
                 continue
 
-            if str(entity.id) == '2131062766':
+            # 设一个黑名单列表，如果 entity.id 在黑名单列表中，则跳过
+            blacklist = [2131062766, 1766929647, 1781549078]  # Example blacklist with entity IDs
+
+            if entity.id in blacklist:
                 continue
+
+
+
+
+            if entity.id == 2131062766 or entity.id == 1766929647:
+                continue
+
+
+         
                 
                 
            
@@ -86,7 +98,7 @@ async def main():
                     last_read_message_id = tgbot.load_last_read_message_id(entity.id)
 
                 print(f">Reading messages from entity {entity.id} - {last_read_message_id}\n")
-                async for message in client.iter_messages(entity, min_id=last_read_message_id, limit=30, reverse=True, filter=InputMessagesFilterEmpty()):
+                async for message in client.iter_messages(entity, min_id=last_read_message_id, limit=50, reverse=True, filter=InputMessagesFilterEmpty()):
                     last_message_id = message.id  # 初始化 last_message_id
                     
                     if message.text:
@@ -127,6 +139,7 @@ async def main():
 
         print("Execution time is " + str(elapsed_time) + " seconds. Continuing next cycle... after 80 seconds.")
         await asyncio.sleep(80)  # 间隔80秒
+        media_count = 0
 
 with client:
     client.loop.run_until_complete(main())

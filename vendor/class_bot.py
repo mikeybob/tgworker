@@ -59,8 +59,9 @@ class LYClass:
             caption_parts.append(f"<a href='https://t.me/c/{message.chat.id}/{message.id}'>LINK</a>")
             if hasattr(message.chat, 'title'):
                 chat_title = message.chat.title
-                chat_title = chat_title.replace(' ', 'ㅤ')
-                caption_parts.append(f"#{chat_title} #C{message.chat.id}")
+                # chat_title = chat_title.replace(' ', 'ㅤ')
+                # chat_title = chat_title.replace("&", "_and_")
+                caption_parts.append(f"{chat_title} #C{message.chat.id}")
             else:
                 caption_parts.append(f"#C{message.chat.id}")
             
@@ -219,56 +220,7 @@ class LYClass:
         except Exception as e:
             print(f"\rAn error occurred: {e}\n")
 
-    # async def blgg(self, client, message):
-    #     bot_username = 'FilesDrive_BLGG_bot'
-    #     await self.wpbot(client, message, bot_username)
-
-    # async def showfiles(self, client, message):
-    #     bot_username = 'ShowFilesBot'
-    #     await self.wpbot(client, message, bot_username)
-
-    # async def datapan(self, client, message):
-    #     bot_username = 'datapanbot'
-    #     await self.wpbot(client, message, bot_username)
-
-    # async def mediabk(self, client, message):
-    #     bot_username = 'MediaBK2Bot'
-    #     await self.wpbot(client, message, bot_username)
-
-    # async def mediabk2(self, client, message):
-    #     bot_username = 'MediaBKBK1Bot'
-    #     await self.wpbot(client, message, bot_username)
-
-    # async def filesave(self, client, message):
-    #     bot_username = 'FileSaveNewBot'
-    #     await self.wpbot(client, message, bot_username)
-
-    # async def wangpan(self, client, message):
-    #     bot_username = 'WangPanBOT'
-    #     await self.wpbot(client, message, bot_username)
-
-    # async def filetobot(self, client, message):
-    #     bot_username = 'filetobot'
-    #     message.text = "/start " + message.text
-    #     await self.wpbot(client, message, bot_username)
-
-    # async def filein(self, client, message):
-    #     bot_username = 'fileinbot'
-    #     message.text = "/start " + message.text
-    #     await self.wpbot(client, message, bot_username)
-
-    # async def fileoffrm(self, client, message):
-    #     bot_username = 'fileoffrm_bot'
-    #     message.text = "/start " + message.text
-    #     await self.wpbot(client, message, bot_username)
-
-    # async def filesave(self, client, message):
-    #     bot_username = 'FileSaveNewBot'
-    #     await self.wpbot(client, message, bot_username)
-
-    # async def filespan1(self, client, message):
-    #     bot_username = 'FilesPan1Bot'
-    #     await self.wpbot(client, message, bot_username)
+    
 
     def save_last_read_message_id(self, chat_id, message_id):
         data = {str(chat_id): message_id}
@@ -302,13 +254,22 @@ class LYClass:
         except Exception as e:
             print(f"加入群组失败: {e}")
 
-    async def forward_media_to_warehouse(self,client,message):
+    async def forward_media_to_warehouse(self, client, message):
         try:
-            print(f">>forward_media_to_WH: {message.id}\n")
             if message.media:
                 if message.chat_id != self.config['warehouse_chat_id']:
-                    print(f"Forwarding media to warehouse chat: {message.id}\n")
-                    last_message_id = await self.send_message(client, message)
+                    last_message_id = message.id
+                    if isinstance(message.media, types.MessageMediaDocument):
+                        if not any(isinstance(attr, types.DocumentAttributeSticker) for attr in message.media.document.attributes):
+                            # 排除贴图
+                            print(f"Forwarding document to warehouse chat: {message.id}\n")
+                            last_message_id = await self.send_message(client, message)
+                    elif isinstance(message.media, types.MessageMediaPhoto):
+                        print(f"Forwarding photo to warehouse chat: {message.id}\n")
+                        last_message_id = await self.send_message(client, message)
+                    elif isinstance(message.media, types.MessageMediaVideo):
+                        print(f"Forwarding video to warehouse chat: {message.id}\n")
+                        last_message_id = await self.send_message(client, message)
                     return last_message_id
                 else:
                     print(f"Message is from warehouse chat, not forwarding: {message.id}\n")
