@@ -256,21 +256,26 @@ class LYClass:
 
     async def forward_media_to_warehouse(self, client, message):
         try:
+            if_send = False
+            last_message_id = message.id
             if message.media:
                 if message.chat_id != self.config['warehouse_chat_id']:
-                    last_message_id = message.id
+                    
                     if isinstance(message.media, types.MessageMediaDocument):
                         if not any(isinstance(attr, types.DocumentAttributeSticker) for attr in message.media.document.attributes):
                             # 排除贴图
                             print(f"Forwarding document to warehouse chat: {message.id}\n")
                             last_message_id = await self.send_message(client, message)
+                            if_send=True
                     elif isinstance(message.media, types.MessageMediaPhoto):
                         print(f"Forwarding photo to warehouse chat: {message.id}\n")
                         last_message_id = await self.send_message(client, message)
+                        if_send=True
                     elif isinstance(message.media, types.MessageMediaVideo):
                         print(f"Forwarding video to warehouse chat: {message.id}\n")
                         last_message_id = await self.send_message(client, message)
-                    return last_message_id
+                        if_send=True
+                    
                 else:
                     print(f"Message is from warehouse chat, not forwarding: {message.id}\n")
             else:
@@ -278,5 +283,7 @@ class LYClass:
         except Exception as e:
             print(f">>(2)An error occurred while processing message: {e} \n message:{message}\n")
         finally:
-            await asyncio.sleep(3)
-        return message.id
+            if if_send:
+                await asyncio.sleep(3)
+            return last_message_id
+        
