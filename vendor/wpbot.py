@@ -1,12 +1,12 @@
 wp_bot = [
-    # {
-    #     'title': 'blgg',
-    #     'bot_name': 'ShowFilesBot',
-    #     'id': '6995324980',  # 6854050358
-    #     'mode': 'enctext',
-    #     'pattern': r'(?:p_|vi_|f_|fds_|pk_)[a-zA-Z0-9-_]{30,100}\b',
-    #     'message_thread_id': '23'
-    # },
+    {
+        'title': 'blgg',
+        'bot_name': 'ShowFilesBot',
+        'id': '6995324980',  # 6854050358
+        'mode': 'enctext',
+        'pattern': r'(?:p_|vi_|f_|fds_|pk_)[a-zA-Z0-9-_]{30,100}\b',
+        'message_thread_id': '23'
+    },
     {
         'title': 'filespan1',
         'bot_name': 'FilesPan1Bot',
