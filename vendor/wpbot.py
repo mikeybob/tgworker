@@ -1,7 +1,7 @@
 wp_bot = [
     {
         'title': 'blgg',
-        'bot_name': 'FilesDrive_BLGG_bot',
+        'bot_name': 'ShowFilesBot',
         'id': '6995324980',  # 6854050358
         'mode': 'enctext',
         'pattern': r'(?:p_|vi_|f_|fds_|pk_)[a-zA-Z0-9-_]{30,100}\b',
