@@ -25,7 +25,7 @@ wp_bot = [
     },
     {
         'title': 'mediabk',
-        'bot_name': 'MediaBK2Bot',
+        'bot_name': 'ShowFilesBot',
         'id': '5231326048',
         'mode': 'enctext',
         'pattern': r'\b[a-zA-Z0-9\-+=_]{20,33}(?:=_grp|_mda)\b',
