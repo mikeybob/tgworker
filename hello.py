@@ -100,21 +100,31 @@ async def main():
                    
                     last_message_id = message.id  # 初始化 last_message_id
                    
+
+                    
+
                     if message.text:
-                        pattern = r'(https?://t\.me/(?:joinchat/)?\+?[a-zA-Z0-9_\-]{15,50}|\+?[a-zA-Z0-9_\-]{15,17})'
-                        matches = re.findall(pattern, message.text)
+                        regex1 = r"https?://t\.me/(?:joinchat/)?\+?[a-zA-Z0-9_\-]{15,50}"
+                        regex2 = r"(?<![a-zA-Z0-9_\-])\+[a-zA-Z0-9_\-]{15,17}(?![a-zA-Z0-9_\-])"
+
+                        # 合并两个正则表达式
+                        combined_regex = rf"({regex1})|({regex2})"
+
+                        # pattern = r'(https?://t\.me/(?:joinchat/)?\+?[a-zA-Z0-9_\-]{15,50}|\+?[a-zA-Z0-9_\-]{15,17})'
+                        matches = re.findall(combined_regex, message.text)
+                        # matches = re.findall(pattern, message.text)
                         if matches:
-                            for i in range(len(matches)):
-                                match_str = matches[i]
+                            for match in matches:
+                                match_str = match[0] or match[1]
                                 if not match_str.startswith('https://t.me/'):
-                                    matches[i] = 'https://t.me/' + matches[i]
+                                    match_str = 'https://t.me/' + match_str
 
-                                if entity.id == tgbot.config['link_chat_id']:
-                                    await tgbot.join_channel_from_link(client, matches[i])    
-                                else:
-                                    await client.send_message(tgbot.config['work_bot_id'], f"{matches[i]}")  
+                                # if entity.id == tgbot.config['link_chat_id']:
+                                #     await tgbot.join_channel_from_link(client, match_str)    
+                                # else:
+                                #     await client.send_message(tgbot.config['work_bot_id'], f"{match_str}")  
 
-                                print(f"'{message.text}' matches: {matches[i]}.")
+                                print(f"'{message.text}' ->matches: {match_str}.\n")
                                      
                         elif entity.id == tgbot.config['work_chat_id']:
                             if media_count >= max_media_count:
@@ -125,9 +135,11 @@ async def main():
                         elif dialog.is_group or dialog.is_channel:
                         
                             if entity.id in enclist:
-                            # 检查字符串中的关键词
+                                # 检查字符串中的关键词
+                                
                                 ckresult = tgbot.check_strings(message.text)
                                 if ckresult:
+                                    print(f"===============\n{message}\n===============\n")
                                     await tgbot.process_by_check_text(message,'encstr')
                             else:    
                                 await tgbot.process_by_check_text(message,'encstr')

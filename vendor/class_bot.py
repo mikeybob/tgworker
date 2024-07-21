@@ -301,8 +301,8 @@ class LYClass:
         
     def check_strings(self,text):
         # 定义要检查的关键词
-        # keywords = ["弟","正太","兄妹","射精","小马","母子","晓马","姐弟","雏鸟","boy","火狼"]
-        keywords = ['姐弟']
+        keywords = ["弟","正太","兄妹","射精","小马","母子","晓马","姐弟","雏鸟","boy","火狼"]
+        # keywords = ['姐弟']
         # 编译正则表达式模式
         pattern = re.compile("|".join(keywords))
         # 查找文本中匹配的关键词
