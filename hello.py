@@ -66,7 +66,7 @@ async def main():
 
             # 设一个黑名单列表，如果 entity.id 在黑名单列表中，则跳过 
             blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646]  # Example blacklist with entity IDs
-
+            enclist = [2012816724,2239552986,2215190216] 
             if entity.id in blacklist:
                 continue                
                 
@@ -100,16 +100,22 @@ async def main():
                    
                     last_message_id = message.id  # 初始化 last_message_id
                    
-
-
                     if message.text:
-                        tme_links = re.findall(r'me/\+[a-zA-Z0-9_\-]{15,17}|me/joinchat/[a-zA-Z0-9_\-]{15,18}', message.text)
-                        if tme_links:
-                            for link in tme_links:
+                        pattern = r'(https?://t\.me/(?:joinchat/)?\+?[a-zA-Z0-9_\-]{15,50}|\+?[a-zA-Z0-9_\-]{15,17})'
+                        matches = re.findall(pattern, message.text)
+                        if matches:
+                            for i in range(len(matches)):
+                                match_str = matches[i]
+                                if not match_str.startswith('https://t.me/'):
+                                    matches[i] = 'https://t.me/' + matches[i]
+
                                 if entity.id == tgbot.config['link_chat_id']:
-                                    await tgbot.join_channel_from_link(client, "https://t."+link)    
+                                    await tgbot.join_channel_from_link(client, matches[i])    
                                 else:
-                                    await client.send_message(tgbot.config['work_bot_id'], f"https://t.{link}")                 
+                                    await client.send_message(tgbot.config['work_bot_id'], f"{matches[i]}")  
+
+                                print(f"'{message.text}' matches: {matches[i]}.")
+                                     
                         elif entity.id == tgbot.config['work_chat_id']:
                             if media_count >= max_media_count:
                                 break
@@ -117,7 +123,14 @@ async def main():
                             await tgbot.process_by_check_text(message,'tobot')
                             media_count = media_count + 1
                         elif dialog.is_group or dialog.is_channel:
-                           await tgbot.process_by_check_text(message,'encstr')
+                        
+                            if entity.id in enclist:
+                            # 检查字符串中的关键词
+                                ckresult = tgbot.check_strings(message.text)
+                                if ckresult:
+                                    await tgbot.process_by_check_text(message,'encstr')
+                            else:    
+                                await tgbot.process_by_check_text(message,'encstr')
                     elif message.media:
                         if tgbot.config['warehouse_chat_id']!=0 and entity.id != tgbot.config['work_chat_id'] and entity.id != tgbot.config['warehouse_chat_id']:
                             if media_count >= max_media_count:

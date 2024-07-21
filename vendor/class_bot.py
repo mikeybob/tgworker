@@ -214,7 +214,7 @@ class LYClass:
                     if response.text == "在您发的这条消息中，没有代码可以被解析":
                         await self.wpbot(self.client, message, 'ShowFilesBot')
                        
-                    elif response.text == "💔抱歉，未找到可解析内容。":
+                    elif "💔抱歉，未找到可解析内容。" in response.text:
                         await client.send_message(chat_id, response.text, reply_to=message.id)
                         
                     elif response.text == "创建者申请了新的分享链接，此链接已过期":
@@ -299,3 +299,12 @@ class LYClass:
                 await asyncio.sleep(3)
             return last_message_id
         
+    def check_strings(self,text):
+        # 定义要检查的关键词
+        # keywords = ["弟","正太","兄妹","射精","小马","母子","晓马","姐弟","雏鸟","boy","火狼"]
+        keywords = ['姐弟']
+        # 编译正则表达式模式
+        pattern = re.compile("|".join(keywords))
+        # 查找文本中匹配的关键词
+        found_keywords = pattern.findall(text)
+        return found_keywords
