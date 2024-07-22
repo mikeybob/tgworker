@@ -170,7 +170,7 @@ async def main():
 
 
         print("Execution time is " + str(elapsed_time) + " seconds. Continuing next cycle... after 80 seconds.")
-        await asyncio.sleep(80)  # 间隔80秒
+        await asyncio.sleep(200)  # 间隔80秒
         media_count = 0
 
 with client:
