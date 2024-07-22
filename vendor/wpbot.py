@@ -4,7 +4,7 @@ wp_bot = [
         'bot_name': 'ShowFilesBot',
         'id': '6995324980',  # 6854050358
         'mode': 'enctext',
-        'pattern': r'(?:p_|vi_|f_|fds_|pk_)[a-zA-Z0-9-_]{30,100}\b',
+        'pattern': r'(?:p_|vi_|f_|fds_)[a-zA-Z0-9-_]{30,100}\b',
         'message_thread_id': '23'
     },
     {
@@ -36,7 +36,7 @@ wp_bot = [
         'bot_name': 'ShowFilesBot',
         'id': '6976547743',  # 6854050358
         'mode': 'enctext',
-        'pattern': r'(?:showfilesbot_|fds_|pk_)[a-zA-Z0-9-_]{15,29}\b',
+        'pattern': r'(?:showfilesbot_|fds_)[a-zA-Z0-9-_]{15,29}\b',
         'message_thread_id': '27'
     },
     {
