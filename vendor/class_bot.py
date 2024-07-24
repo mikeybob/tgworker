@@ -22,7 +22,6 @@ class LYClass:
     async def process_by_check_text(self,message,mode):
         try:
             enc_exist = False
-            
             if message.text:
                 for bot in wp_bot:
                     pattern = re.compile(bot['pattern'])
