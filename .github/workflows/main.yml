@@ -82,6 +82,7 @@ jobs:
         WORK_CHAT_ID: ${{ secrets.WORK_CHAT_ID }}
         PUBLIC_BOT_ID: ${{ secrets.PUBLIC_BOT_ID }}
         WAREHOUSE_CHAT_ID: ${{ secrets.WAREHOUSE_CHAT_ID }}
+        LINK_CHAT_ID: ${{ secrets.LINK_CHAT_ID }}
       run: |
         python hello.py
 
