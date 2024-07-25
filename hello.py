@@ -126,8 +126,12 @@ async def main():
                                     print(f"'{message.text}' ->matches: {match_str}. =>join\n")
                                     await tgbot.join_channel_from_link(client, match_str)  
 
+                                    print(f"'{message.text}' ->matches: {match_str}. =>join\n")
+                                    await tgbot.join_channel_from_link(client, match_str)  
+
                                 else:
                                     print(f"'{message.text}' ->matches: {match_str}  {entity.id} {tgbot.config['link_chat_id']}. =>forward\n")
+                                    print(f"'{message.text}' ->matches: {match_str}  {entity.id} {tgbot.config['link_chat_id']} =>forward\n")
                                     await client.send_message(tgbot.config['work_bot_id'], f"{match_str}")  
 
                                

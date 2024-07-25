@@ -252,7 +252,7 @@ class LYClass:
 
     async def join_channel_from_link(self, client, invite_link):
         try:
-            # print(f"Joining channel from link: {invite_link}")
+            print(f"Joining channel from link: {invite_link}")
             # 提取邀请链接中的哈希部分
             invite_hash = invite_link.split('/')[-1]
 
