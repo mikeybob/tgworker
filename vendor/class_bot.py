@@ -32,7 +32,7 @@ class LYClass:
                             print(f">>send to QQ: {message.id}\n")
                             async with self.client.conversation(self.config['work_bot_id']) as conv:
                                 await conv.send_message(match)
-                                print(match)
+                                # print(match)
                         elif mode == 'tobot':
                             print(f">>send to Enctext BOT: {message.id}\n")
                             await self.wpbot(self.client, message, bot['bot_name'])

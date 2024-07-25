@@ -32,13 +32,12 @@ try:
         'work_chat_id': int(os.getenv('WORK_CHAT_ID', 0)),  # 默认值为0
         'public_bot_id': os.getenv('PUBLIC_BOT_ID'),
         'warehouse_chat_id': int(os.getenv('WAREHOUSE_CHAT_ID', 0)),  # 默认值为0
-        'link_chat_id': int(os.getenv('LINK_CHAT_ID', 0)),  # 默认值为0
-        'invitation_chat_id': int(os.getenv('INVITATION_CHAT_ID', 0))  # 默认值为0
+        'link_chat_id': int(os.getenv('LINK_CHAT_ID', 0))
     }
 
     # 创建 LYClass 实例
     tgbot = LYClass(client,config)
-    print(f"{tgbot.config}")
+    
    
 except ValueError:
     print("Environment variable WORK_CHAT_ID or WAREHOUSE_CHAT_ID is not a valid integer.")
@@ -46,7 +45,7 @@ except ValueError:
     
 #max_process_time 設為 1200 秒，即 20 分鐘
 max_process_time = 1200  # 20分钟
-max_media_count = 20  # 10个媒体文件
+max_media_count = 25  # 10个媒体文件
 max_count_per_chat = 5  # 每个对话的最大消息数
 
 async def main():
@@ -68,7 +67,9 @@ async def main():
                 continue
 
             # 设一个黑名单列表，如果 entity.id 在黑名单列表中，则跳过 
-            blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646]  # Example blacklist with entity IDs
+            blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646,93372553,2197546676]  # Example blacklist with entity IDs
+            # blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646,93372553,2215190216,2239552986,2215190216]
+
             enclist = [2012816724,2239552986,2215190216] 
             if entity.id in blacklist:
                 continue                
@@ -84,7 +85,7 @@ async def main():
                 
             
 
-            if dialog.unread_count >= 0 and (dialog.is_group or dialog.is_channel):
+            if dialog.unread_count >= 0 and (dialog.is_group or dialog.is_channel or dialog.is_user):
                 count_per_chat=0;
                 
 
@@ -103,10 +104,24 @@ async def main():
                    
                     last_message_id = message.id  # 初始化 last_message_id
                    
-
                     
+                    if message.media:
+                        # print(f">>>Reading Media from entity {entity.id}/{entity_title} - {message}\n")
+                        if tgbot.config['warehouse_chat_id']!=0 and entity.id != tgbot.config['work_chat_id'] and entity.id != tgbot.config['warehouse_chat_id']:
+                            if media_count >= max_media_count:
+                                break
+                            if count_per_chat >= max_count_per_chat:
+                                break
+                            last_message_id = await tgbot.forward_media_to_warehouse(client,message)
+                            # print(f"last_message_id: {last_message_id}")
+                            media_count = media_count + 1
+                            count_per_chat = count_per_chat +1
+                            last_read_message_id = last_message_id
+                        else:
+                            print(f"Media from {tgbot.config['warehouse_chat_id']} {entity.id} {tgbot.config['work_chat_id']} \n")
 
-                    if message.text:
+                    elif message.text:
+                        # print(f">>>Reading TEXT from entity {entity.id}/{entity_title} - {message}\n")
                         regex1 = r"https?://t\.me/(?:joinchat/)?\+?[a-zA-Z0-9_\-]{15,50}"
                         regex2 = r"(?<![a-zA-Z0-9_\-])\+[a-zA-Z0-9_\-]{15,17}(?![a-zA-Z0-9_\-])"
 
@@ -123,13 +138,13 @@ async def main():
                                     match_str = 'https://t.me/' + match_str
 
                                 if entity.id == tgbot.config['link_chat_id']:
-                                    print(f"'{message.text}' ->matches: {match_str}. =>join\n")
+                                    # print(f"'{message.text}' ->matches: {match_str}. =>join\n")
                                     await tgbot.join_channel_from_link(client, match_str)  
 
                                   
 
                                 else:
-                                    print(f"'{message.text}' ->matches: {match_str}  {entity.id} {tgbot.config['link_chat_id']}. =>forward\n")
+                                    # print(f"'{message.text}' ->matches: {match_str}  {entity.id} {tgbot.config['link_chat_id']}. =>forward\n")
                                    
                                     await client.send_message(tgbot.config['work_bot_id'], f"{match_str}")  
 
@@ -148,7 +163,7 @@ async def main():
                                 
                                 ckresult = tgbot.check_strings(message.text)
                                 if ckresult:
-                                    print(f"===============\n{message}\n===============\n")
+                                    # print(f"===============\n{message}\n===============\n")
                                     await tgbot.process_by_check_text(message,'encstr')
                             else:    
                                 if '国产赏鲸团' in message.text:
@@ -162,18 +177,7 @@ async def main():
                                         await conv.send_message(text)
                                 else:
                                     await tgbot.process_by_check_text(message,'encstr')
-                    elif message.media:
-                       
-                        if tgbot.config['warehouse_chat_id']!=0 and entity.id != tgbot.config['work_chat_id'] and entity.id != tgbot.config['warehouse_chat_id']:
-                            if media_count >= max_media_count:
-                                break
-                            if count_per_chat >= max_count_per_chat:
-                                break
-                            last_message_id = await tgbot.forward_media_to_warehouse(client,message)
-                            print(f"last_message_id: {last_message_id}")
-                            media_count = media_count + 1
-                            count_per_chat = count_per_chat +1
-                            last_read_message_id = last_message_id
+                    
                            
                     tgbot.save_last_read_message_id(entity.id, last_message_id)
                    
@@ -185,13 +189,13 @@ async def main():
 
         elapsed_time = time.time() - start_time
         if elapsed_time > max_process_time:  
-            print(f"Execution time exceeded {max_process_time} seconds. Stopping.")
+            print(f"/nExecution time exceeded {max_process_time} seconds. Stopping./n")
             break
 
 
 
         print("Execution time is " + str(elapsed_time) + " seconds. Continuing next cycle... after 80 seconds.")
-        await asyncio.sleep(200)  # 间隔80秒
+        await asyncio.sleep(180)  # 间隔80秒
         media_count = 0
 
 with client:
