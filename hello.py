@@ -5,7 +5,7 @@ from vendor.wpbot import wp_bot  # 导入 wp_bot
 import asyncio
 import time
 import re
-from telethon.tl.types import InputMessagesFilterEmpty, Message, User, Chat, Channel
+from telethon.tl.types import InputMessagesFilterEmpty, Message, User, Chat, Channel, MessageMediaWebPage
 
 # 检查是否在本地开发环境中运行
 if not os.getenv('GITHUB_ACTIONS'):
@@ -54,27 +54,42 @@ async def main():
     start_time = time.time()
     media_count = 0
     
+    try:
+        await tgbot.client.send_message(tgbot.config['work_bot_id'], "Hello! I'm ready to work.")
+    except Exception as e:
+        print(f"Error sending message to work_bot_id: {e}")
+        return
+    
+
     while True:
+        NEXT_CYCLE = False
         async for dialog in client.iter_dialogs():
+            NEXT_DIALOGS = False
+            
+
+
             entity = dialog.entity
            
             # 跳过来自 WAREHOUSE_CHAT_ID 的对话
             if entity.id == tgbot.config['warehouse_chat_id']:
+                NEXT_DIALOGS = True
                 continue
            
             # 如果entity.id 是属于 wp_bot 下的 任一 id, 则跳过
             if entity.id in [int(bot['id']) for bot in wp_bot]:
+                NEXT_DIALOGS = True
                 continue
 
             # 设一个黑名单列表，如果 entity.id 在黑名单列表中，则跳过 
-            blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646,93372553,2197546676]  # Example blacklist with entity IDs
-            # blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646,93372553,2215190216,2239552986,2215190216]
+            # blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646,93372553,2197546676]  # Example blacklist with entity IDs
+            blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646,93372553,2215190216,2239552986,2215190216,2171778803,1704752058]
 
             enclist = [2012816724,2239552986,2215190216] 
 
             skip_vaildate_list =[2201450328]
 
             if entity.id in blacklist:
+                NEXT_DIALOGS = True
                 continue                
                 
            
@@ -101,19 +116,24 @@ async def main():
 
                 print(f">Reading messages from entity {entity.id}/{entity_title} - {last_read_message_id}\n")
                 async for message in client.iter_messages(entity, min_id=last_read_message_id, limit=50, reverse=True, filter=InputMessagesFilterEmpty()):
-                    
+                    NEXT_MESSAGE = False
+
                     if message.id <= last_read_message_id:
                         continue
                    
                     last_message_id = message.id  # 初始化 last_message_id
                    
                     
-                    if message.media:
+                    if message.media and not isinstance(message.media, MessageMediaWebPage):
                         # print(f">>>Reading Media from entity {entity.id}/{entity_title} - {message}\n")
                         if tgbot.config['warehouse_chat_id']!=0 and entity.id != tgbot.config['work_chat_id'] and entity.id != tgbot.config['warehouse_chat_id']:
+                            
                             if media_count >= max_media_count:
+                                NEXT_CYCLE = True
                                 break
+                            
                             if count_per_chat >= max_count_per_chat:
+                                NEXT_DIALOGS = True
                                 break
                             last_message_id = await tgbot.forward_media_to_warehouse(client,message)
                             # print(f"last_message_id: {last_message_id}")
@@ -142,7 +162,11 @@ async def main():
 
                                 if entity.id == tgbot.config['link_chat_id']:
                                     # print(f"'{message.text}' ->matches: {match_str}. =>join\n")
-                                    await tgbot.join_channel_from_link(client, match_str)  
+                                    join_result = await tgbot.join_channel_from_link(client, match_str)  
+                                    if not join_result:
+                                        print(f"Failed to join channel from link: {match_str}")
+                                        NEXT_DIALOGS = True
+                                        break
 
                                   
 
@@ -150,11 +174,12 @@ async def main():
                                     # print(f"'{message.text}' ->matches: {match_str}  {entity.id} {tgbot.config['link_chat_id']}. =>forward\n")
                                    
                                     await client.send_message(tgbot.config['work_bot_id'], f"{match_str}")  
-
+                            # print(f"matches: 178\n")
                                
                                      
                         elif entity.id == tgbot.config['work_chat_id']:
                             if media_count >= max_media_count:
+                                NEXT_CYCLE = True
                                 break
 
                             await tgbot.process_by_check_text(message,'tobot')
@@ -184,20 +209,30 @@ async def main():
                                         await conv.send_message(text)
                                 else:
                                     await tgbot.process_by_check_text(message,'encstr')
-                    
+
+
                            
                     tgbot.save_last_read_message_id(entity.id, last_message_id)
-                   
+
+                    if NEXT_MESSAGE or NEXT_DIALOGS or NEXT_CYCLE:
+                        # print(f"matches: 218\n")
+                        break   
 
 
             elapsed_time = time.time() - start_time
             if elapsed_time > max_process_time:  
+                NEXT_CYCLE = True
                 break                
+            
+            if  NEXT_DIALOGS or NEXT_CYCLE:
+                break 
 
-        elapsed_time = time.time() - start_time
-        if elapsed_time > max_process_time:  
+
+
+        if NEXT_CYCLE:
             print(f"/nExecution time exceeded {max_process_time} seconds. Stopping./n")
             break
+        
 
 
 
