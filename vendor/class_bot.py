@@ -22,7 +22,6 @@ class LYClass:
     async def process_by_check_text(self,message,mode):
         try:
             enc_exist = False
-            
             if message.text:
                 for bot in wp_bot:
                     pattern = re.compile(bot['pattern'])
@@ -33,7 +32,7 @@ class LYClass:
                             print(f">>send to QQ: {message.id}\n")
                             async with self.client.conversation(self.config['work_bot_id']) as conv:
                                 await conv.send_message(match)
-                                print(match)
+                                # print(match)
                         elif mode == 'tobot':
                             print(f">>send to Enctext BOT: {message.id}\n")
                             await self.wpbot(self.client, message, bot['bot_name'])
@@ -253,7 +252,7 @@ class LYClass:
 
     async def join_channel_from_link(self, client, invite_link):
         try:
-            # print(f"Joining channel from link: {invite_link}")
+            print(f"Joining channel from link: {invite_link}")
             # 提取邀请链接中的哈希部分
             invite_hash = invite_link.split('/')[-1]
 
