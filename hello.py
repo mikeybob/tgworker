@@ -71,6 +71,9 @@ async def main():
             # blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646,93372553,2215190216,2239552986,2215190216]
 
             enclist = [2012816724,2239552986,2215190216] 
+
+            skip_vaildate_list =[2201450328]
+
             if entity.id in blacklist:
                 continue                
                 
@@ -167,6 +170,10 @@ async def main():
                                     await tgbot.process_by_check_text(message,'encstr')
                             else:    
                                 if '赏鲸' in message.text:
+
+                                    if entity.id in skip_vaildate_list:
+                                        continue
+
                                     if isinstance(entity, Channel) or isinstance(entity, Chat):
                                         entity_title = entity.title
 
@@ -194,7 +201,7 @@ async def main():
 
 
 
-        print("Execution time is " + str(elapsed_time) + " seconds. Continuing next cycle... after 80 seconds.")
+        print("/nExecution time is " + str(elapsed_time) + " seconds. Continuing next cycle... after 80 seconds./n")
         await asyncio.sleep(180)  # 间隔80秒
         media_count = 0
 
