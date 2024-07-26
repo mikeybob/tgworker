@@ -166,7 +166,7 @@ async def main():
                                     # print(f"===============\n{message}\n===============\n")
                                     await tgbot.process_by_check_text(message,'encstr')
                             else:    
-                                if '国产赏鲸团' in message.text:
+                                if '赏鲸' in message.text:
                                     if isinstance(entity, Channel) or isinstance(entity, Chat):
                                         entity_title = entity.title
 
