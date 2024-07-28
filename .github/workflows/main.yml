@@ -2,11 +2,11 @@ name: Deploy Telethon
 
 on: 
   schedule:
-   - cron: '*/30 * * * *'  # 每 30 分钟运行一次
+   - cron: '*/30 * * * *'  # - Run every 30 minutes
   push: 
     branches: 
       - master 
-  workflow_dispatch: # 添加这一行以支持手动触发
+  workflow_dispatch: # - Add this line to support manual triggering
 
 jobs:
   run-telethon-bot:
