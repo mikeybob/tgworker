@@ -1,4 +1,5 @@
-from telethon import types
+
+from telethon import types,errors
 import asyncio
 import json
 import os
@@ -95,7 +96,7 @@ class LYClass:
                     await asyncio.sleep(0.5)  # 间隔80秒
                     last_message_id = max(row.id for row in album)
                     await client.send_file(self.config['warehouse_chat_id'], album, reply_to=message.id, caption=caption_text, parse_mode='html')
-                    print(f"Forwarded album:{last_message_id}")
+                    print(f">>Forwarded album:{last_message_id}\n")
                     # print(f"{message.id}")
                     # print(f"{album[0].id}")
                     # print(f"{album[-1].id}")
@@ -109,7 +110,7 @@ class LYClass:
                     # 处理视频
                     video = message.media.document
                     await client.send_file(self.config['warehouse_chat_id'], video, reply_to=message.id, caption=caption_text, parse_mode='html')
-                    print("Forwarded video.")
+                    print(">>Forwarded video.\n")
                     
                     # 调用新的函数
                     #await self.send_video_to_filetobot_and_publish(client, video, message)
@@ -117,12 +118,12 @@ class LYClass:
                     # 处理文档
                     document = message.media.document
                     await client.send_file(self.config['warehouse_chat_id'], document, reply_to=message.id, caption=caption_text, parse_mode='html')
-                    print("Forwarded document.")
+                    print(">>Forwarded document.\n")
             elif isinstance(message.media, types.MessageMediaPhoto):
                 # 处理图片
                 photo = message.media.photo
                 await client.send_file(self.config['warehouse_chat_id'], photo, reply_to=message.id, caption=caption_text, parse_mode='html')
-                print("Forwarded photo.")
+                print(">>Forwarded photo.\n")
             else:
                 print("Received media, but not a document, video, photo, or album.")
         except WorkerBusyTooLongRetryError:
@@ -262,8 +263,21 @@ class LYClass:
             # 通过邀请链接加入群组
             updates = await client(ImportChatInviteRequest(invite_hash))
             print(f"成功加入群组: {updates.chats[0].title}")
+            return True
+        
+        except errors.FloodWaitError as e:
+            print(f"BB-A wait of {e.seconds} seconds is required (caused by ImportChatInviteRequest)")
+            return False
         except Exception as e:
-            print(f"加入群组失败: {e}")
+            print(f"An error occurred: {e}")
+            return True
+
+
+
+
+
+        
+       
 
     async def forward_media_to_warehouse(self, client, message):
         try:
@@ -282,10 +296,7 @@ class LYClass:
                         print(f"Forwarding photo to warehouse chat: {message.id}\n")
                         last_message_id = await self.send_message(client, message)
                         if_send=True
-                    elif isinstance(message.media, types.MessageMediaVideo):
-                        print(f"Forwarding video to warehouse chat: {message.id}\n")
-                        last_message_id = await self.send_message(client, message)
-                        if_send=True
+                    
                     
                 else:
                     print(f"Message is from warehouse chat, not forwarding: {message.id}\n")

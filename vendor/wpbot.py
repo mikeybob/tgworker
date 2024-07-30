@@ -1,8 +1,8 @@
 wp_bot = [
     {
         'title': 'blgg',
-        'bot_name': 'ShowFilesBot',
-        'id': '6995324980',  # 6854050358
+        'bot_name': 'FilesDrive_BLGA_bot',
+        'id': '7485716743',  # 6854050358
         'mode': 'enctext',
         'pattern': r'(?:p_|vi_|f_|fds_)[a-zA-Z0-9-_]{30,100}\b',
         'message_thread_id': '23'
@@ -25,8 +25,8 @@ wp_bot = [
     },
     {
         'title': 'mediabk',
-        'bot_name': 'ShowFilesBot',
-        'id': '5231326048',
+        'bot_name': 'MediaBK4Bot',
+        'id': '7386890195',
         'mode': 'enctext',
         'pattern': r'\b[a-zA-Z0-9\-+=_]{20,33}(?:=_grp|_mda)\b',
         'message_thread_id': '32'
