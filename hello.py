@@ -45,8 +45,8 @@ except ValueError:
     
 #max_process_time 設為 1200 秒，即 20 分鐘
 max_process_time = 1200  # 20分钟
-max_media_count = 25  # 10个媒体文件
-max_count_per_chat = 5  # 每个对话的最大消息数
+max_media_count = 50  # 10个媒体文件
+max_count_per_chat = 10  # 每个对话的最大消息数
 
 async def main():
     await client.start(phone_number)
@@ -84,7 +84,7 @@ async def main():
             blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646,93372553,2197546676]  # Example blacklist with entity IDs
             # blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646,93372553,2215190216,2239552986,2215190216,2171778803,1704752058]
 
-            enclist = [2012816724,2239552986,2215190216] 
+            enclist = [2012816724,2239552986,2215190216,7061290326] 
 
             skip_vaildate_list =[2201450328]
 
