@@ -3,7 +3,7 @@ name: tgworker-sync
 on: push
 
 jobs:
-  ronin-sync:
+  tgworker-sync:
     runs-on: ubuntu-latest  # Use a suitable runner for your workflow
     steps:
 
