@@ -11,4 +11,4 @@ members of the designated group the bot is assigned to may redeem a file receipt
 
 [![tgworker-sync](https://github.com/mikeybob/tgworker/actions/workflows/UpstreamSync.yml/badge.svg)](https://github.com/mikeybob/tgworker/actions/workflows/UpstreamSync.yml) 
 
-**Forked fom little2/tgworker**
+**Forked from little2/tgworker**
