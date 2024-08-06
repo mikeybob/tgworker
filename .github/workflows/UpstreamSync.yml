@@ -1,8 +1,9 @@
 name: tgworker-sync
 
-on: push
- schedule:
- - cron "05 */3 * * *"    # Every 3 hours at 0005, 0605, 1205, 1805
+on: 
+  push:
+  schedule:
+    - cron: "15 4,5 * * *"    # Every 3 hours at 0005, 0605, 1205, 1805
 jobs:
   tgworker-sync:
     runs-on: ubuntu-latest  # Use a suitable runner for your workflow
