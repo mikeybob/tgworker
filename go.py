@@ -48,7 +48,7 @@ except ValueError:
 # max_media_count = 50  # 10个媒体文件
 # max_count_per_chat = 10  # 每个对话的最大消息数
 
-max_process_time = 120  # 20分钟
+max_process_time = 5  # 20分钟
 max_media_count = 1  # 10个媒体文件
 max_count_per_chat = 2  # 每个对话的最大消息数
 
