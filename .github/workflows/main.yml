@@ -48,6 +48,7 @@ jobs:
             console.error('Error fetching repository:', error)
             throw error  // Rethrow to fail the step
           }
+      continue-on-error: true
             
     - name: Get previous workflow run ID
       uses: actions/github-script@v6
