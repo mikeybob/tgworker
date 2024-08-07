@@ -72,7 +72,7 @@ jobs:
         WAREHOUSE_CHAT_ID: ${{ secrets.WAREHOUSE_CHAT_ID }}
         LINK_CHAT_ID: ${{ secrets.LINK_CHAT_ID }}
       run: |
-        python hello.py
+        python go.py
 
     - name: Check if last_read_message_id.json was created
       run: |
@@ -88,6 +88,28 @@ jobs:
       with:
         name: last_read_message
         path: last_read_message_id.json
+
+    - name: Delete old workflow runs
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const runs = await github.rest.actions.listWorkflowRuns({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            workflow_id: 'main.yml',  // 使用 main.yml 作为 workflow_id
+            per_page: 100,  // 获取最多100个运行
+          });
+
+          const runIdsToDelete = runs.data.workflow_runs.slice(4).map(run => run.id);
+
+          for (const runId of runIdsToDelete) {
+            await github.rest.actions.deleteWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId,
+            });
+            console.log(`Deleted workflow run with ID: ${runId}`);
+          }
     
 
         
