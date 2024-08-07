@@ -14,6 +14,6 @@ jobs:
     - name: Sync with upstream
       uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
       with:
-        target_sync_branch: main
+        target_sync_branch: updev
         upstream_sync_repo: little2/tgworker
         upstream_sync_branch: main
