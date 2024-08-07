@@ -166,3 +166,4 @@ cython_debug/
 last_read_message_id.json
 t.sh
 encoder.sh
+encode.bat
