@@ -1,8 +1,8 @@
-name: Deploy Telethon
+name: Deploy Telethon 
 
 on: 
   schedule:
-    - cron: '*/30 * * * *'  # 每 30 分钟运行一次
+   - cron: '*/30 * * * *' 
   push: 
     branches: 
       - master 
@@ -41,15 +41,16 @@ jobs:
           const runs = await github.rest.actions.listWorkflowRuns({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            workflow_id: context.workflow,
-            per_page: 2, // Fetch the two most recent runs
+            workflow_id: 'main.yml',  
+            per_page: 1,
             status: 'success',
           });
-          if (runs.data.workflow_runs.length > 1) {
-            core.setOutput('run_id', runs.data.workflow_runs[1].id); // Previous successful run
+          if (runs.data.workflow_runs.length > 0) {
+            core.setOutput('run_id', runs.data.workflow_runs[0].id);
           } else {
             core.setFailed('No previous successful workflow run found');
           }
+      continue-on-error: true
 
     - name: Download artifacts
       uses: actions/download-artifact@v4
@@ -57,18 +58,8 @@ jobs:
         name: last_read_message
         path: .
         run-id: ${{ steps.get-previous-run-id.outputs.run_id }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
       continue-on-error: true
-
-    - name: Display structure of downloaded files
-      run: ls -R
-
-    - name: Check for last_read_message_id.json
-      run: |
-        if [ -f last_read_message_id.json ]; then
-          echo "last_read_message_id.json exists."
-        else
-          echo "last_read_message_id.json does not exist."
-        fi      
 
     - name: Run Telethon script
       env:
@@ -81,7 +72,7 @@ jobs:
         WAREHOUSE_CHAT_ID: ${{ secrets.WAREHOUSE_CHAT_ID }}
         LINK_CHAT_ID: ${{ secrets.LINK_CHAT_ID }}
       run: |
-        python go.py
+        python hello.py
 
     - name: Check if last_read_message_id.json was created
       run: |
@@ -91,29 +82,12 @@ jobs:
           echo "last_read_message_id.json was not created."
         fi
 
+
     - name: Upload last_read_message_id.json artifact
       uses: actions/upload-artifact@v4
       with:
         name: last_read_message
         path: last_read_message_id.json
+    
 
-    # 删除上一个工作流运行日志的步骤
-    - name: Delete Previous Workflow Run Log
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        run_ids=$(gh run list --workflow ${{ github.workflow }} --limit 2 --json databaseId --jq '.[].databaseId')
-
-        # 将运行 ID 转换为数组
-        run_id_array=($run_ids)
-
-        # 获取第二个 ID，即上一个运行
-        previous_run_id=${run_id_array[1]}
-
-        # 删除上一个工作流运行日志
-        if [ -n "$previous_run_id" ]; then
-          echo "Deleting previous run ID: $previous_run_id"
-          gh run delete $previous_run_id --confirm
-        else
-          echo "No previous run found to delete."
-        fi
+        
