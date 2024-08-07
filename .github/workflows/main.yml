@@ -81,7 +81,7 @@ jobs:
         WAREHOUSE_CHAT_ID: ${{ secrets.WAREHOUSE_CHAT_ID }}
         LINK_CHAT_ID: ${{ secrets.LINK_CHAT_ID }}
       run: |
-        python hello.py
+        python go.py
 
     - name: Check if last_read_message_id.json was created
       run: |
