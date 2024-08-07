@@ -32,23 +32,6 @@ jobs:
         SESSION_PASSWORD: ${{ secrets.SESSION_PASSWORD }}
       run: |
         openssl aes-256-cbc -d -pbkdf2 -in "${{ secrets.API_ID }}session_name.session.enc" -out "${{ secrets.API_ID }}session_name.session" -pass pass:"${{ secrets.SESSION_PASSWORD }}"
-
-
-    - name: Run GitHub Script
-      uses: actions/github-script@v6
-      with:
-        script: |
-          try {
-            const { data: repo } = await github.repos.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            })
-            console.log(repo)
-          } catch (error) {
-            console.error('Error fetching repository:', error)
-            throw error  // Rethrow to fail the step
-          }
-      continue-on-error: true
             
     - name: Get previous workflow run ID
       uses: actions/github-script@v6
@@ -89,7 +72,7 @@ jobs:
         WAREHOUSE_CHAT_ID: ${{ secrets.WAREHOUSE_CHAT_ID }}
         LINK_CHAT_ID: ${{ secrets.LINK_CHAT_ID }}
       run: |
-        python go.py
+        python hello.py
 
     - name: Check if last_read_message_id.json was created
       run: |
