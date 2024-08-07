@@ -164,5 +164,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 last_read_message_id.json
-t.sh
-encoder.sh
+*.sh
+*.bat
