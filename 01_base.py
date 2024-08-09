@@ -1,8 +1,6 @@
 from telethon.sync import TelegramClient
-from telethon.tl.functions.messages import SendMessageRequest
-from telethon.tl.types import InputPeerUser
 import os
-from vendor.class_bot import LYClass  # 导入 LYClass
+
 
 # 检查是否在本地开发环境中运行
 if not os.getenv('GITHUB_ACTIONS'):

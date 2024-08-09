@@ -32,7 +32,8 @@ try:
         'work_chat_id': int(os.getenv('WORK_CHAT_ID', 0)),  # 默认值为0
         'public_bot_id': os.getenv('PUBLIC_BOT_ID'),
         'warehouse_chat_id': int(os.getenv('WAREHOUSE_CHAT_ID', 0)),  # 默认值为0
-        'link_chat_id': int(os.getenv('LINK_CHAT_ID', 0))
+        'link_chat_id': int(os.getenv('LINK_CHAT_ID', 0)),
+        'key_word': os.getenv('KEY_WORD'),
     }
 
     # 创建 LYClass 实例
