@@ -49,7 +49,7 @@ max_count_per_chat = 5  # 每个对话的最大消息数
 async def main():
     await client.start(phone_number)
 
-    botlist = [7452636047,7075620315,6588695181,6373803154,6086006554]  
+    botlist = [7068146094,7452636047,7075620315,6588695181,6373803154,6086006554]  
         
    
     for bot_id in botlist:
