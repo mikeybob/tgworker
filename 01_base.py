@@ -20,5 +20,5 @@ with TelegramClient(session_name, api_id, api_hash) as client:
     client.start(phone_number)
      # Send a message
     # client.send_message('me', 'Hello, World!')
-    client.send_message('datapanbot', 'V_DataPanBot_KAkpwpuqF9D6uT56gExZfqc9e1WYV1CiY7M83qpSRZe94drUxmI0oKNXTG')
+    client.send_message('datapanbot', 'test')
     print('Message sent successfully!')
