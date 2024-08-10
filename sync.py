@@ -49,13 +49,13 @@ max_count_per_chat = 5  # 每个对话的最大消息数
 async def main():
     await client.start(phone_number)
 
-    botlist = [7068146094,7452636047,7075620315,6588695181,6373803154,6086006554]  
-        
+    botlist = ['@ztdMiWen005Bot','@ztdStone005BOT']  
+        # //,7452636047,7075620315,6588695181,6373803154,6086006554
    
     for bot_id in botlist:
         try:
             await tgbot.client.send_message(bot_id, "/start")
-            await tgbot.client.send_message(bot_id, str(bot_id))
+        #    // await tgbot.client.send_message(bot_id, str(bot_id))
         except Exception as e:
             print(f"Error sending message to work_bot_id: {e}")
             continue
