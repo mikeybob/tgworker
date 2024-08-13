@@ -258,14 +258,14 @@ async def main():
 
 
         if NEXT_CYCLE:
-            print(f"/nExecution time exceeded {max_process_time} seconds. Stopping./n")
+            print(f"\nExecution time exceeded {max_process_time} seconds. Stopping.\n")
             break
         
 
 
 
-        print("/nExecution time is " + str(elapsed_time) + " seconds. Continuing next cycle... after 80 seconds./n")
-        await asyncio.sleep(180)  # 间隔80秒
+        print("\nExecution time is " + str(elapsed_time) + " seconds. Continuing next cycle... after 180 seconds.\n")
+        await asyncio.sleep(180)  # 间隔180秒
         media_count = 0
 
 with client:
