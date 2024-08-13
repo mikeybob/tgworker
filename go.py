@@ -127,7 +127,7 @@ async def main():
                         continue
                    
                     last_message_id = message.id  # 初始化 last_message_id
-                    print("\r\n")
+                   
                     
                     if message.media and not isinstance(message.media, MessageMediaWebPage):
                        
