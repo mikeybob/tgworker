@@ -118,7 +118,7 @@ async def main():
                 else:
                     last_read_message_id = tgbot.load_last_read_message_id(entity.id)
                 
-                print(f">Reading messages from entity {entity.id}/{entity_title} - {last_read_message_id}\n")
+                # print(f">Reading messages from entity {entity.id}/{entity_title} - {last_read_message_id}\n")
                 async for message in client.iter_messages(entity, min_id=last_read_message_id, limit=50, reverse=True, filter=InputMessagesFilterEmpty()):
                     NEXT_MESSAGE = False
                    
@@ -145,14 +145,22 @@ async def main():
                             count_per_chat = count_per_chat +1
                             last_read_message_id = last_message_id
                         else:
-                            print(f"Media from {tgbot.config['warehouse_chat_id']} {entity.id} {tgbot.config['work_chat_id']} \n")
+                            if tgbot.config['warehouse_chat_id']!=0:
+                                print(f"Media from warehouse is empty \n")
+                            elif entity.id == tgbot.config['work_chat_id']:
+                                print(f"skipping work_chat\n")
+                            elif entity.id == tgbot.config['warehouse_chat_id']:
+                                print(f"skipping warehouse\n")
+
+                                
+                           
 
                     elif message.text:
                        
                         if message.text.startswith("|_kick_|"):
                             try:
                                 botname = message.text[len("|_kick_|"):]
-                                print(f"Kicking bot {botname} from {entity.id}/{entity_title}")
+                               
                                 await tgbot.client.send_message(botname, "/start")
                             except Exception as e:
                                 print(f"Error kicking bot: {e}")
@@ -160,7 +168,7 @@ async def main():
                             finally:
                                 NEXT_MESSAGE = True
                                 continue
-                                break
+                               
 
 
                         # print(f">>>Reading TEXT from entity {entity.id}/{entity_title} - {message}\n")
