@@ -126,6 +126,10 @@ async def main():
                     if message.id <= last_read_message_id:
                         continue
                    
+                    if message.from_id == tgbot.config['work_bot_id'] and message.id <= 14244:
+                        continue
+                        
+
                     last_message_id = message.id  # 初始化 last_message_id
                    
                     

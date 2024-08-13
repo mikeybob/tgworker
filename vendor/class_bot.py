@@ -153,7 +153,7 @@ class LYClass:
                 print("filetobot response timeout.")
                 return
 
-            # 将 filetobot 的响应内容传送给 beachboy807bot，并设置 caption 为原始消息的文本
+            # 将 filetobot 的响应内容传送给 public_bot_id，并设置 caption 为原始消息的文本
             async with client.conversation(self.config['public_bot_id']) as publicbot_conv:
                 caption_text = "|_SendToBeach_|\n"+original_message.text+"\n"+filetobot_response.message
                 await publicbot_conv.send_file(filetobot_response.media, caption=caption_text)
