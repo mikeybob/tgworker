@@ -118,7 +118,8 @@ async def main():
                 else:
                     last_read_message_id = tgbot.load_last_read_message_id(entity.id)
                 
-                # print(f">Reading messages from entity {entity.id}/{entity_title} - {last_read_message_id}\n")
+                
+                print(f"\r\n>Reading messages from entity {entity.id}/{entity_title} - {last_read_message_id}\n")
                 async for message in client.iter_messages(entity, min_id=last_read_message_id, limit=50, reverse=True, filter=InputMessagesFilterEmpty()):
                     NEXT_MESSAGE = False
                    
@@ -126,7 +127,7 @@ async def main():
                         continue
                    
                     last_message_id = message.id  # 初始化 last_message_id
-                   
+                    print("\r\n")
                     
                     if message.media and not isinstance(message.media, MessageMediaWebPage):
                        

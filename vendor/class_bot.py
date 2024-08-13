@@ -146,7 +146,7 @@ class LYClass:
                     if filetobot_response.media:
                         break
                     else:
-                        print("Received text response, waiting for media...")
+                        print(">>>Received text response, waiting for media...")
 
             except asyncio.TimeoutError:
                 await client.send_message(self.config['work_chat_id'], "filetobot timeout", reply_to=original_message_id)
@@ -157,7 +157,7 @@ class LYClass:
             async with client.conversation(self.config['public_bot_id']) as publicbot_conv:
                 caption_text = "|_SendToBeach_|\n"+original_message.text+"\n"+filetobot_response.message
                 await publicbot_conv.send_file(filetobot_response.media, caption=caption_text)
-                print("Forwarded filetobot response to publish bot with caption.")
+                print(">>>>Forwarded filetobot response to publish bot with caption.")
 
     async def wpbot(self, client, message, bot_username):
         try:
@@ -187,7 +187,7 @@ class LYClass:
                             # 处理视频
                             video = response.media.document
                             await client.send_file(chat_id, video, reply_to=message.id)
-                            print("Forwarded video.")
+                            print(">>>Forwarded video.")
                             
                             # 调用新的函数
                             await self.send_video_to_filetobot_and_publish(client, video, message)
