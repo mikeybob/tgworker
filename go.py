@@ -227,7 +227,7 @@ async def main():
                                     # print(f"===============\n{message}\n===============\n")
                                     await tgbot.process_by_check_text(message,'encstr')
                             else:    
-                                if '赏鲸' in message.text:
+                                if '海水浴场' in message.text:
 
                                     if entity.id in skip_vaildate_list:
                                         continue
