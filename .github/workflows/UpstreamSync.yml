@@ -19,4 +19,4 @@ jobs:
         target_sync_branch: updev
         upstream_sync_repo: little2/tgworker
         upstream_sync_branch: main
-        test_mode: true
+        test_mode: false
