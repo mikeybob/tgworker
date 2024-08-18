@@ -213,9 +213,10 @@ class LYClass:
                     # 处理文本
                     if response.text == "在您发的这条消息中，没有代码可以被解析":
                         await self.wpbot(self.client, message, 'ShowFilesBot')
-                       
                     elif "💔抱歉，未找到可解析内容。" in response.text:
-                        await client.send_message(chat_id, response.text, reply_to=message.id)
+                        await client.send_message(chat_id, response.text, reply_to=message.id)   
+                    elif "不能为你服务" in response.text:
+                        await client.send_message(chat_id, "the bot was timeout", reply_to=message.id)
                         
                     elif response.text == "创建者申请了新的分享链接，此链接已过期":
                         await self.wpbot(self.client, message, 'ShowFilesBot')
