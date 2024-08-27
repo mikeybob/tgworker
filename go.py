@@ -48,6 +48,7 @@ except ValueError:
 max_process_time = 1200  # 20分钟
 max_media_count = 50  # 10个媒体文件
 max_count_per_chat = 10  # 每个对话的最大消息数
+max_break_time = 150  # 休息时间
 
 
 
@@ -87,7 +88,7 @@ async def main():
             blacklist = [2131062766, 1766929647, 1781549078, 6701952909, 6366395646,93372553,2197546676]  # Example blacklist with entity IDs
             # blacklist = [2154650877,2190384328,2098764817,1647589965,1731239234,1877274724,2131062766, 1766929647, 1781549078, 6701952909, 6366395646,93372553,2215190216,2239552986,2215190216,2171778803,1704752058]
 
-            enclist = [2012816724,2239552986,2215190216,7061290326] 
+            enclist = [2012816724,2239552986,2215190216,7061290326,2175483382] 
 
             skip_vaildate_list =[2201450328]
 
@@ -271,8 +272,8 @@ async def main():
 
 
 
-        print("\nExecution time is " + str(elapsed_time) + " seconds. Continuing next cycle... after 180 seconds.\n")
-        await asyncio.sleep(180)  # 间隔180秒
+        print("\nExecution time is " + str(elapsed_time) + f" seconds. Continuing next cycle... after {max_break_time} seconds.\n")
+        await asyncio.sleep(max_break_time)  # 间隔180秒
         media_count = 0
 
 with client:
