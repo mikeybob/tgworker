@@ -71,7 +71,9 @@ jobs:
         PUBLIC_BOT_ID: ${{ secrets.PUBLIC_BOT_ID }}
         WAREHOUSE_CHAT_ID: ${{ secrets.WAREHOUSE_CHAT_ID }}
         LINK_CHAT_ID: ${{ secrets.LINK_CHAT_ID }}
+        KEY_WORD: ${{ secrets.KEY_WORD }}
       run: |
+        echo "The value of KEY_WORD is: $KEY_WORD"
         python go.py
 
     - name: Check if last_read_message_id.json was created
