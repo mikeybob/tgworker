@@ -71,15 +71,8 @@ jobs:
         PUBLIC_BOT_ID: ${{ secrets.PUBLIC_BOT_ID }}
         WAREHOUSE_CHAT_ID: ${{ secrets.WAREHOUSE_CHAT_ID }}
         LINK_CHAT_ID: ${{ secrets.LINK_CHAT_ID }}
-        KEY_WORD: ${{ secrets.KEY_WORD }}
       run: |
-        echo "$KEY_WORD" > key_word.txt
-        
-    - name: Upload KEY_WORD file
-      uses: actions/upload-artifact@v4
-      with:
-        name: key_word
-        path: key_word.txt        
+        python go.py
 
     - name: Check if last_read_message_id.json was created
       run: |
